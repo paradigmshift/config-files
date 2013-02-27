@@ -1,0 +1,23 @@
+[user]
+	name = Mozart Reina
+	email = mo.opensource@gmail.com
+
+[color]
+ui = auto
+
+[color "diff"]
+    meta = blue bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse      
+
+[color "status"]
+    added = blue
+    changed = green
+    untracked = cyan
+
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
+
+

@@ -1,0 +1,18 @@
+(require :asdf)
+(require :asdf-install)
+(setf SB-IMPL::*DEFAULT-EXTERNAL-FORMAT* :utf-8)
+;;; The following lines added by ql:add-to-init-file:
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
+(ql:quickload "my-tools")
+(ql:quickload "ltk")
+
+(let ((wish "/home/mo/bin/wish"))
+  (when (probe-file wish)
+           (setq ltk::*wish-pathname* wish)))
+
+                                
