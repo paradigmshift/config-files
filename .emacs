@@ -72,7 +72,7 @@ FORCE-OTHER-WINDOW is ignored."
 
 ;; open links in rekonq
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "xulrunner ~/compiled/conkeror/application.ini")
+      browse-url-generic-program "run-conkeror")
 
 ;;;; global keymap settings
 ;; map window splitting to META 1, 2, 3, 0
@@ -487,11 +487,15 @@ FORCE-OTHER-WINDOW is ignored."
               ((string-match "freenode\\.net" SERVER)
                (erc-message  "PRIVMSG" "NickServ identify forzaitalia")))))
 
-(defun irc-maybe ()
-  "Connect to IRC."
+(defun irc-connect ()
   (interactive)
-  (when (y-or-n-p "IRC? ")
-    (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina")))
+  (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina"))
+
+;; (defun irc-maybe ()
+;;   "Connect to IRC."
+;;   (interactive)
+;;   (when (y-or-n-p "IRC? ")
+;;     (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina")))
 
 ;; check channels
 (erc-track-mode t)
@@ -561,8 +565,9 @@ FORCE-OTHER-WINDOW is ignored."
    mu4e-get-mail-command "email-update.sh"   ;; or fetchmail, or ...
    mu4e-update-interval 600
    message-kill-buffer-on-exit t
-   mu4e-view-show-images t
+   mu4e-view-show-images nil
    mu4e-image-max-width 800
+   mu4e-html2text-command "html2text -utf8 -width 72"
    mu4e-html2text-command "w3m -dump -T text/html"
    w3m-command "/usr/bin/w3m"
    mu4e-view-prefer-html t
@@ -603,7 +608,9 @@ FORCE-OTHER-WINDOW is ignored."
              ((string-match "momo" (mu4e-message-field msg :maildir)) 
               "/momo/[Gmail].All Mail") 
              ((string-match "opensource" (mu4e-message-field msg :maildir)) 
-              "/opensource/[Gmail].All Mail")) 
+              "/opensource/[Gmail].All Mail")
+             ((string-match "mozart" (mu4e-message-field msg :maildir)) 
+              "/mozart/[Gmail].All Mail")) 
           "/urban/[Gmail].All Mail")))
 
 
