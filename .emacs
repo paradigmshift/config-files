@@ -54,6 +54,25 @@ FORCE-OTHER-WINDOW is ignored."
 ;; ido mode for buffer switching
 (ido-mode t)
 
+;; window-number for window swithcing
+(autoload 'window-number-mode "window-number"
+"A global minor mode that enables selection of windows according to
+numbers with the C-x C-j prefix. Another mode,
+`window-number-meta-mode' enables the use of the M- prefix."
+t)
+
+(autoload 'window-number-meta-mode "window-number"
+"A global minor mode that enables use of the M- prefix to select
+windows, use `window-number-mode' to display the window numbers in
+the mode-line."
+t)
+
+(add-hook 'window-number-mode-hook
+          (lambda ()
+            (window-number-define-keys window-number-mode-map "C-x C-j ")))
+
+(autoload 'window-number-mode "window-number" t)
+
 ;; package manager
 (package-initialize)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
@@ -479,7 +498,7 @@ FORCE-OTHER-WINDOW is ignored."
 ;; autojoin
 (erc-autojoin-mode t)
 (setq erc-autojoin-channels-alist
-      '((".*\\.freenode.net" "#lisp")))
+      '((".*\\.freenode.net" "#lisp" "#sbcl" "#lispweb")))
 
 (add-hook 'erc-after-connect
           '(lambda (SERVER NICK)
@@ -565,7 +584,7 @@ FORCE-OTHER-WINDOW is ignored."
    mu4e-get-mail-command "email-update.sh"   ;; or fetchmail, or ...
    mu4e-update-interval 600
    message-kill-buffer-on-exit t
-   mu4e-view-show-images nil
+   mu4e-view-show-images t
    mu4e-image-max-width 800
    mu4e-html2text-command "html2text -utf8 -width 72"
    mu4e-html2text-command "w3m -dump -T text/html"
