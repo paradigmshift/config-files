@@ -58,20 +58,16 @@ FORCE-OTHER-WINDOW is ignored."
 (autoload 'window-number-mode "window-number"
 "A global minor mode that enables selection of windows according to
 numbers with the C-x C-j prefix. Another mode,
-`window-number-meta-mode' enables the use of the M- prefix."
+`window-number-meta-mode` enables the use of the M- prefix."
 t)
 
-(autoload 'window-number-meta-mode "window-number"
-"A global minor mode that enables use of the M- prefix to select
-windows, use `window-number-mode' to display the window numbers in
-the mode-line."
-t)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (window-number-mode 1)))
 
 (add-hook 'window-number-mode-hook
           (lambda ()
             (window-number-define-keys window-number-mode-map "C-x C-j ")))
-
-(autoload 'window-number-mode "window-number" t)
 
 ;; package manager
 (package-initialize)
@@ -229,6 +225,7 @@ t)
  '(ac-delay 0.01)
  '(auto-save-file-name-transforms (quote ((".*" "~/.emacs.d/autosaves/\\1" t))))
  '(backup-directory-alist (quote ((".*" . "~/.emacs.d/backups/"))))
+ '(dired-bind-jump nil)
  '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom stamp track)))
  '(inhibit-startup-screen t)
  '(js2-basic-offset 2)
