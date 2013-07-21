@@ -10,7 +10,7 @@
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   )
 
-(defun linux
+(defun linux ()
   ;; loading elisp files 
   (add-to-list 'load-path "/home/mo/dev/elisp")
   (require 'ssl)
