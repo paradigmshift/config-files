@@ -1,4 +1,3 @@
-;;;; generic settings
 
 (defun osx ()
   ;; open links in google-chrome
@@ -8,6 +7,8 @@
   ;; load zenburn on init
   (load-theme 'zenburn t)
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
+  ;; ace-jump-mode
+  (add-to-list 'load-path "/Users/mozartreina/.emacs.d/elisp/ace-jump-mode")
   )
 
 (defun linux ()
@@ -18,7 +19,9 @@
   (setq x-select-enable-clipboard t)
   ;; set default directory
   (setq default-directory "/home/mo/")
-  ;; open links in rekonq
+  ;; ace-jump-mode
+  (add-to-list 'load-path "~/dev/elisp/ace-jump-mode")
+  ;; open links in conkeror
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "run-conkeror")
       ;;;; bbdb
@@ -175,14 +178,9 @@
   (setq message-sendmail-envelope-from 'header)
   (add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
   (add-hook 'message-send-mail-hook 'choose-msmtp-account)
-
-  ;; loading auto-complete
-  (require 'auto-complete-config)
-  (ac-config-default)
-  (global-auto-complete-mode t)
-  (auto-complete-mode t)
   )
 
+;;;; GENERIC SETTINGS
 ;; elpa settings
 (require 'package)
 (add-to-list 'package-archives 
@@ -193,6 +191,13 @@
 (if (eq system-type 'darwin)
     (osx)
   (linux))
+
+;; loading auto-complete
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+(global-auto-complete-mode t)
+(auto-complete-mode t)
     
 ;; open files over ssh
 (require 'tramp)
@@ -325,7 +330,7 @@ t)
 ;; resize window on loading 
 (setq initial-frame-alist
   `((left . 70) (top . 30)
-    (width . 100) (height . 38)))
+    (width . 160) (height . 50)))
 
 ;; highlight current line 
 (global-hl-line-mode 1)
@@ -360,7 +365,7 @@ t)
 
 (make-directory "~/.emacs.d/autosaves/" t)
 
-;;;; mode specific settings
+;;;; MODE SPECIFIC SETTINGS
 ;;;; emacs lisp
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (local-set-key (kbd "RET") 'newline-and-indent)))
@@ -496,18 +501,25 @@ t)
 (add-hook 'slime-mode-hook (lambda()
   (local-set-key (kbd "RET") 'newline-and-indent)))
 
-(add-hook 'slime-mode-hook 'forwardsexp-mode-hook)
+(defun slimekbd-mode-hook ()
+  (define-key slime-mode-map (kbd "C-t") 'transpose-sexps)
+  (define-key slime-mode-map (kbd "C-M-t") 'transpose-chars)
+  )
 
-(defun forwardsexp-mode-hook ()
-  (define-key slime-mode-map (kbd "C-f") 'forward-sexp)
-  (define-key slime-mode-map (kbd "C-M-f") 'forward-char)
-  (define-key slime-mode-map (kbd "C-b") 'backward-sexp)
-  (define-key slime-mode-map (kbd "C-M-b") 'backward-char))
+(add-hook 'slime-mode-hook 'slimekbd-mode-hook)
+
+;; paredit
+(autoload 'enable-paredit-mode "paredit" t)
+(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook #'enable-paredit-mode)
+(add-hook 'slime-mode-hook #'enable-paredit-mode)
+(define-key slime-mode-map [(?\()] 'paredit-open-list)
+(define-key slime-mode-map [(?\))] 'paredit-close-list)
 
 ;;;; ace-jump-Mode
 ;; cloned from git because elpa version outdated
 
-(add-to-list 'load-path "/Users/mozartreina/.emacs.d/elisp/ace-jump-mode")
+
 (autoload
   'ace-jump-mode
   "ace-jump-mode"
@@ -548,15 +560,10 @@ t)
   (interactive)
   (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina"))
 
-;; (defun irc-maybe ()
-;;   "Connect to IRC."
-;;   (interactive)
-;;   (when (y-or-n-p "IRC? ")
-;;     (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina")))
-
 ;; check channels
 (erc-track-mode t)
 (setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE"
                                 "324" "329" "332" "333" "353" "477"))
 ;; don't show any of this
 (setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK"))
+
