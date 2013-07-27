@@ -372,7 +372,8 @@ t)
 
 ;;;; C
 (add-hook 'c-mode-hook (lambda ()
-                         ( c-set-style "k&r")))
+                         (c-set-style "k&r")
+                         (electric-pair-mode 1)))
 
 (add-hook 'c-mode-hook' (lambda ()
   (local-set-key (kbd "RET") 'newline-and-indent)))
