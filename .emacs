@@ -370,6 +370,12 @@ t)
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (local-set-key (kbd "RET") 'newline-and-indent)))
 
+;;;; C
+(add-hook 'c-mode-hook (lambda ()
+                         ( c-set-style "k&r")))
+
+(add-hook 'c-mode-hook' (lambda ()
+  (local-set-key (kbd "RET") 'newline-and-indent)))
 ;;;; html
 ;; bind RET to newline-and-indent in HTML
 (add-hook 'html-mode-hook' (lambda ()
