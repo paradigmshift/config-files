@@ -1,4 +1,3 @@
-
 (defun osx ()
   ;; open links in google-chrome
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
@@ -9,6 +8,9 @@
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   ;; ace-jump-mode
   (add-to-list 'load-path "/Users/mozartreina/.emacs.d/elisp/ace-jump-mode")
+  ;; flyspell
+  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+  (setq exec-path (append exec-path '("/usr/local/bin")))
   )
 
 (defun linux ()
@@ -183,9 +185,9 @@
 ;;;; GENERIC SETTINGS
 ;; elpa settings
 (require 'package)
-(add-to-list 'package-archives 
-    '("marmalade" .
-      "http://marmalade-repo.org/packages/"))
+(setq package-archives '(("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
 (if (eq system-type 'darwin)
@@ -246,11 +248,8 @@ FORCE-OTHER-WINDOW is ignored."
 
 (setq display-buffer-function 'th-display-buffer)
 
-;; ido mode for buffer switching
-(ido-mode t)
-
-;; hide menu bar
-(menu-bar-mode -1)
+(ido-mode t) ; ido mode for buffer switching
+(menu-bar-mode -1) ; hide menu bar
 
 ;; window-number for window swithcing
 (autoload 'window-number-mode "window-number"
@@ -311,39 +310,25 @@ t)
 (global-set-key (kbd "C-,") 'select-previous-window)
 
 ;; map buffer switching to C-X C-, and C-.
-
 (global-set-key (kbd "C-x C-.") 'next-buffer)
 (global-set-key (kbd "C-x C-,") 'previous-buffer)
 
-;; binding C-x C-m to META-x
-(global-set-key (kbd "C-x C-m") 'execute-extended-command)
-
-;; set C-w to 'backward-kill-word
-(global-set-key (kbd "C-w") 'backward-kill-word)
-
-;; set C-x C-k to kill-region
-(global-set-key (kbd "C-x C-k") 'kill-region)
-
-;; word-wrap 
-(global-set-key (kbd "<f7>") 'toggle-truncate-lines)
+(global-set-key (kbd "C-x C-m") 'execute-extended-command) ; binding C-x C-m to META-x
+(global-set-key (kbd "C-w") 'backward-kill-word) ; set C-w to 'backward-kill-word
+(global-set-key (kbd "C-x C-k") 'kill-region) ; set C-x C-k to kill-region
+(global-set-key (kbd "<f7>") 'toggle-truncate-lines) ; word-wrap
 
 ;; resize window on loading 
 (setq initial-frame-alist
   `((left . 70) (top . 30)
     (width . 160) (height . 50)))
 
-;; highlight current line 
-(global-hl-line-mode 1)
+(global-hl-line-mode 1) ; highlight current line 
+(setq scroll-step 1) ; set default scrolling step
+(global-hl-line-mode 1) ; highlight current line 
 
-;; set default scrolling step
-(setq scroll-step 1)
-
-;; highlight current line 
-(global-hl-line-mode 1)
-
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-(setq-default py-indent-offset 4)
+(setq-default indent-tabs-mode nil) ; space for tabs
+(setq-default tab-width 4) ; width for tab
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -356,7 +341,7 @@ t)
  '(dired-bind-jump nil)
  '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom stamp track)))
  '(inhibit-startup-screen t)
- '(js2-basic-offset 2)
+ '(js2-basic-offset 4)
  '(python-python-command "python")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
@@ -372,122 +357,16 @@ t)
 
 ;;;; C
 (add-hook 'c-mode-hook (lambda ()
-                         ( c-set-style "k&r")))
+                         ( c-set-style "k&r")
+                         (electric-pair-mode 1)))
 
 (add-hook 'c-mode-hook' (lambda ()
   (local-set-key (kbd "RET") 'newline-and-indent)))
+
 ;;;; html
 ;; bind RET to newline-and-indent in HTML
 (add-hook 'html-mode-hook' (lambda ()
   (local-set-key (kbd "RET") 'newline-and-indent)))
-
-;;;; python
-;; bind RET to py-newline-and-indent in Python 
-(add-hook 'python-mode-hook ' (lambda ()
-    (define-key python-mode-map "\C-m" 'newline-and-indent)))
-
-;; Electric Pairs
-(add-hook 'python-mode-hook
-    (lambda ()
-        (define-key python-mode-map "\"" 'electric-pair)
-        (define-key python-mode-map "\'" 'electric-pair)
-        (define-key python-mode-map "(" 'electric-pair)
-        (define-key python-mode-map "[" 'electric-pair)
-        (define-key python-mode-map "{" 'electric-pair)))
-(defun electric-pair()
-    "Insert character pair without sournding spaces"
-    (interactive)
-    (let (parens-require-spaces)
-        (insert-pair)))
-
-;;;; javascript
-;; fixing indentation for JS2-mode
-;; loading javascript2 mode
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-
-(autoload 'espresso-mode "espresso")
-
-(defun my-js2-indent-function ()
-  (interactive)
-  (save-restriction
-    (widen)
-    (let* ((inhibit-point-motion-hooks t)
-           (parse-status (save-excursion (syntax-ppss (point-at-bol))))
-           (offset (- (current-column) (current-indentation)))
-           (indentation (espresso--proper-indentation parse-status))
-           node)
-
-      (save-excursion
-
-        ;; I like to indent case and labels to half of the tab width
-        (back-to-indentation)
-        (if (looking-at "case\\s-")
-            (setq indentation (+ indentation (/ espresso-indent-level 2))))
-
-        ;; consecutive declarations in a var statement are nice if
-        ;; properly aligned, i.e:
-        ;;
-        ;; var foo = "bar",
-        ;;     bar = "foo";
-        (setq node (js2-node-at-point))
-        (when (and node
-                   (= js2-NAME (js2-node-type node))
-                   (= js2-VAR (js2-node-type (js2-node-parent node))))
-          (setq indentation (+ 4 indentation))))
-
-      (indent-line-to indentation)
-      (when (> offset 0) (forward-char offset)))))
-
-(defun my-indent-sexp ()
-  (interactive)
-  (save-restriction
-    (save-excursion
-      (widen)
-      (let* ((inhibit-point-motion-hooks t)
-             (parse-status (syntax-ppss (point)))
-             (beg (nth 1 parse-status))
-             (end-marker (make-marker))
-             (end (progn (goto-char beg) (forward-list) (point)))
-             (ovl (make-overlay beg end)))
-        (set-marker end-marker end)
-        (overlay-put ovl 'face 'highlight)
-        (goto-char beg)
-        (while (< (point) (marker-position end-marker))
-          ;; don't reindent blank lines so we don't set the "buffer
-          ;; modified" property for nothing
-          (beginning-of-line)
-          (unless (looking-at "\\s-*$")
-            (indent-according-to-mode))
-          (forward-line))
-        (run-with-timer 0.5 nil '(lambda(ovl)
-                                   (delete-overlay ovl)) ovl)))))
-
-(defun my-js2-mode-hook ()
-  (require 'espresso)
-  (setq espresso-indent-level 2
-        indent-tabs-mode nil
-        c-basic-offset 2)
-  (c-toggle-auto-state 0)
-  (c-toggle-hungry-state 1)
-  (set (make-local-variable 'indent-line-function) 'my-js2-indent-function)
-  (define-key js2-mode-map [(meta control |)] 'cperl-lineup)
-  (define-key js2-mode-map [(meta control \;)] 
-    '(lambda()
-       (interactive)
-       (insert "/* -----[ ")
-       (save-excursion
-         (insert " ]----- */"))
-       ))
-  (define-key js2-mode-map [(return)] 'newline-and-indent)
-  (define-key js2-mode-map [(backspace)] 'c-electric-backspace)
-  (define-key js2-mode-map [(control d)] 'c-electric-delete-forward)
-  (define-key js2-mode-map [(control meta q)] 'my-indent-sexp)
-  (if (featurep 'js2-highlight-vars)
-    (js2-highlight-vars-mode))
-  (message "My JS2 hook"))
-
-(add-hook 'js2-mode-hook 'my-js2-mode-hook)
 
 ;;;; LISP
 ;; load SLIME 
@@ -497,13 +376,12 @@ t)
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 (setq lisp-indent-function 'common-lisp-indent-function)
 
-(slime-setup '(slime-repl))
+(slime-setup '(slime-js slime-repl))
 
 ;; set lisp-specific auto-complete
 (require 'ac-slime)
 (add-hook 'slime-mode-hook 'set-up-slime-ac)
 
-;; bind RET to newline-and-indent
 (add-hook 'slime-mode-hook (lambda()
   (local-set-key (kbd "RET") 'newline-and-indent)))
 
@@ -522,9 +400,58 @@ t)
 (define-key slime-mode-map [(?\()] 'paredit-open-list)
 (define-key slime-mode-map [(?\))] 'paredit-close-list)
 
+;;;; javascript
+(require 'autopair)
+(require 'js2-refactor)
+(autoload 'js2-mode "js2-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'load-path "~/.emacs.d/elisp/slime-js")
+(add-to-list 'load-path "~/.emacs.d/elisp/")
+
+(require 'setup-slime-js)
+
+(slime-setup '(slime-js slime-repl))
+(setq slime-js-swank-command "/usr/local/bin/swank-js")
+(setq slime-js-swank-args '())
+
+(js2r-add-keybindings-with-prefix "C-c C-m")
+(global-set-key [f5] 'slime-js-reload)
+
+(add-hook 'js2-mode-hook (lambda ()
+  (local-set-key (kbd "RET") 'newline-and-indent)
+  (slime-js-minor-mode 1)
+  (setq slime-use-autodoc-mode nil)
+  (autopair-mode 1)))
+
+;;;; python
+(setq py-install-directory "~/.emacs.d/python-mode.el-6.0.12")
+(add-to-list 'load-path py-install-directory)
+(require 'python-mode)
+
+(setq auto-mode-alist (cons '("\\.py$" . python-mode) auto-mode-alist))
+(setq interpreter-mode-alist (cons '("python" . python-mode)
+interpreter-mode-alist))
+(autoload 'python-mode "python-mode" "Python editing mode." t)
+
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+
+(setq-default py-indent-offset 4)
+
+(setq-default py-shell-name "ipython")
+(setq-default py-which-bufname "IPython")
+
+(setq py-shell-switch-buffers-on-execute-p t)
+(setq py-switch-buffers-on-execute-p t)
+
+(add-hook 'python-mode-hook ' (lambda ()
+                                (local-set-key (kbd "RET") 'newline-and-indent)
+                                (autopair-mode 1)))
+
+(setq py-set-complete-keymap-p t)
+
 ;;;; ace-jump-Mode
 ;; cloned from git because elpa version outdated
-
 
 (autoload
   'ace-jump-mode
@@ -572,4 +499,3 @@ t)
                                 "324" "329" "332" "333" "353" "477"))
 ;; don't show any of this
 (setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK"))
-
