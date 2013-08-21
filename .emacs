@@ -244,8 +244,10 @@ FORCE-OTHER-WINDOW is ignored."
 (setq display-buffer-function 'th-display-buffer)
 
 (ido-mode t) ; ido mode for buffer switching
+(setq ido-enable-flex-matching t)
 (ido-ubiquitous-mode 1) ; ido mode everywhere
 
+(show-paren-mode 1) ; show matching
 (menu-bar-mode -1) ; hide menu bar
 
 ;; window-number for window swithcing
