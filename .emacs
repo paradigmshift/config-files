@@ -7,10 +7,12 @@
   (load-theme 'zenburn t)
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   ;; ace-jump-mode
-  (add-to-list 'load-path "/Users/mozartreina/.emacs.d/elisp/ace-jump-mode")
+  (add-to-list 'load-path "/Users/mozartreina/.emacs.d/ace-jump-mode")
   ;; flyspell
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
   (setq exec-path (append exec-path '("/usr/local/bin")))
+  
+  (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path for swank-js
   )
 
 (defun linux ()
@@ -180,6 +182,16 @@
   (setq message-sendmail-envelope-from 'header)
   (add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
   (add-hook 'message-send-mail-hook 'choose-msmtp-account)
+  (global-set-key "\M-x"
+   (lambda ()
+     (interactive)
+     (call-interactively
+      (intern
+       (ido-completing-read "M-x " (all-completions "" obarray 'commandp)))))) ; ido-mode for M-x
+
+
+  
+  (setq slime-js-swank-command "/usr/bin/swank-js") ; archlinux path for swank-js
   )
 
 ;;;; GENERIC SETTINGS
@@ -371,6 +383,7 @@ t)
 ;;;; LISP
 ;; load SLIME 
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
+(add-to-list 'load-path "~/.emacs.d/slime-js")
 (require 'slime)
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
@@ -405,13 +418,12 @@ t)
 (require 'js2-refactor)
 (autoload 'js2-mode "js2-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(add-to-list 'load-path "~/.emacs.d/elisp/slime-js")
-(add-to-list 'load-path "~/.emacs.d/elisp/")
+(add-to-list 'load-path "~/.emacs.d/")
 
 (require 'setup-slime-js)
 
 (slime-setup '(slime-js slime-repl))
-(setq slime-js-swank-command "/usr/local/bin/swank-js")
+
 (setq slime-js-swank-args '())
 
 (js2r-add-keybindings-with-prefix "C-c C-m")
