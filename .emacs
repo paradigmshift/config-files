@@ -1,34 +1,25 @@
 (defun osx ()
-  ;; open links in google-chrome
-  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
-  ;; strange ecb requirement
-  (setq stack-trace-on-error t)
-  ;; load zenburn on init
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser) ; open links in google-chrome
+  (setq stack-trace-on-error t) ; strange ecb requirement
   (load-theme 'zenburn t)
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
-  ;; ace-jump-mode
-  (add-to-list 'load-path "/Users/mozartreina/.emacs.d/ace-jump-mode")
+  (add-to-list 'load-path "/Users/mozartreina/.emacs.d/ace-jump-mode") ; ace-jump-mode (ELPA version outdated)
   ;; flyspell
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
   (setq exec-path (append exec-path '("/usr/local/bin")))
-  
   (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path for swank-js
   )
 
 (defun linux ()
-  ;; loading elisp files 
-  (add-to-list 'load-path "/home/mo/dev/elisp")
+  (add-to-list 'load-path "/home/mo/dev/elisp") ; loading elisp files (should consoldiate location for OSx and linux)
   (require 'ssl)
-  ;; cut and copy enable X clipboard
-  (setq x-select-enable-clipboard t)
-  ;; set default directory
-  (setq default-directory "/home/mo/")
-  ;; ace-jump-mode
-  (add-to-list 'load-path "~/dev/elisp/ace-jump-mode")
-  ;; open links in conkeror
+  (setq x-select-enable-clipboard t) ; cut and copy enable X clipboard
+  (setq default-directory "/home/mo/") ; set default directory
+  (add-to-list 'load-path "~/dev/elisp/ace-jump-mode") ; ace-jump-mode
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "run-conkeror")
-      ;;;; bbdb
+        browse-url-generic-program "run-conkeror") ; open links in conkeror
+  
+  ;;;; bbdb
   (add-to-list 'load-path "~/dev/elisp/bbdb")
   (require 'bbdb)
   (bbdb-initialize)
@@ -76,10 +67,9 @@
        (color-theme-initialize)
        (color-theme-zenburn)))
 
-      ;;;; inferior lisp
   (setq inferior-lisp-program "sbcl -K full")
 
-      ;;;; mu4e
+  ;;;; mu4e
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
   (when (fboundp 'imagemagick-register-types)
     (imagemagick-register-types))
@@ -182,14 +172,6 @@
   (setq message-sendmail-envelope-from 'header)
   (add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
   (add-hook 'message-send-mail-hook 'choose-msmtp-account)
-  (global-set-key "\M-x"
-   (lambda ()
-     (interactive)
-     (call-interactively
-      (intern
-       (ido-completing-read "M-x " (all-completions "" obarray 'commandp)))))) ; ido-mode for M-x
-
-
   
   (setq slime-js-swank-command "/usr/bin/swank-js") ; archlinux path for swank-js
   )
@@ -202,6 +184,7 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
+;; load appropriate platform settings
 (if (eq system-type 'darwin)
     (osx)
   (linux))
@@ -261,6 +244,8 @@ FORCE-OTHER-WINDOW is ignored."
 (setq display-buffer-function 'th-display-buffer)
 
 (ido-mode t) ; ido mode for buffer switching
+(ido-ubiquitous-mode 1) ; ido mode everywhere
+
 (menu-bar-mode -1) ; hide menu bar
 
 ;; window-number for window swithcing
@@ -287,6 +272,8 @@ t)
   (indent-according-to-mode))
 
 (global-set-key (kbd "M-O") 'smart-open-line-above)
+
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;; map top level folding to F1
 (defun mo-toggle-selective-display ()
@@ -509,5 +496,5 @@ interpreter-mode-alist))
 (erc-track-mode t)
 (setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE"
                                 "324" "329" "332" "333" "353" "477"))
-;; don't show any of this
-(setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK"))
+
+(setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK")) ; don't show any of this
