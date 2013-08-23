@@ -184,6 +184,23 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
+;; auto-install these on a fresh install
+(defvar my-packages '(ac-slime
+                      auto-complete
+                      exec-path-from-shell
+                      ido-ubiquitous
+                      ipython
+                      js2-mode
+                      js2-refactor
+                      magit
+                      paredit
+                      yasnippet
+                      window-number))
+
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
+
 ;; load appropriate platform settings
 (if (eq system-type 'darwin)
     (osx)
