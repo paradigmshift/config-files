@@ -7,7 +7,9 @@
   ;; flyspell
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
   (setq exec-path (append exec-path '("/usr/local/bin")))
-  (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path for swank-js
+  (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path
+                                        ; for swank-js
+  (setq magit-emacsclient-executable "/usr/local/bin/emacsclient") ; osx path for working emacsclient
   )
 
 (defun linux ()
