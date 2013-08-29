@@ -6,7 +6,9 @@
   (add-to-list 'load-path "/Users/mozartreina/.emacs.d/ace-jump-mode") ; ace-jump-mode (ELPA version outdated)
   ;; flyspell
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-  (setq exec-path (append exec-path '("/usr/local/bin")))
+  (setq exec-path (append exec-path '("/usr/local/bin")
+                          '("/Library/Frameworks/Python.framework/Versions/3.3/bin")
+                          '("~/bin/")))
   (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path
                                         ; for swank-js
   (setq magit-emacsclient-executable "/usr/local/bin/emacsclient") ; osx path for working emacsclient
@@ -362,7 +364,7 @@ t)
  '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom stamp track)))
  '(inhibit-startup-screen t)
  '(js2-basic-offset 4)
- '(python-python-command "python")
+ '(python-python-command "python3.3")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
@@ -446,6 +448,7 @@ t)
 ;;;; python
 (setq py-install-directory "~/.emacs.d/python-mode.el-6.0.12")
 (add-to-list 'load-path py-install-directory)
+(setq py-set-complete-keymap-p t)
 (require 'python-mode)
 
 (setq auto-mode-alist (cons '("\\.py$" . python-mode) auto-mode-alist))
@@ -455,10 +458,10 @@ interpreter-mode-alist))
 
 (global-font-lock-mode t)
 (setq font-lock-maximum-decoration t)
-
 (setq-default py-indent-offset 4)
 
-(setq-default py-shell-name "ipython")
+(setq python-shell-interpreter "ipython3")
+(setq-default py-shell-name "ipython3")
 (setq-default py-which-bufname "IPython")
 
 (setq py-shell-switch-buffers-on-execute-p t)
@@ -466,9 +469,8 @@ interpreter-mode-alist))
 
 (add-hook 'python-mode-hook ' (lambda ()
                                 (local-set-key (kbd "RET") 'newline-and-indent)
-                                (autopair-mode 1)))
-
-(setq py-set-complete-keymap-p t)
+                                (autopair-mode 1)
+                                'jedi:ac-setup))
 
 ;;;; ace-jump-Mode
 ;; cloned from git because elpa version outdated
