@@ -4,6 +4,10 @@
   (load-theme 'zenburn t)
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   (add-to-list 'load-path "/Users/mozartreina/.emacs.d/ace-jump-mode") ; ace-jump-mode (ELPA version outdated)
+
+  ;;;; C header files
+  (defvar *c-headers*
+    '("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/include"))
   ;; flyspell
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
   (setq exec-path (append exec-path '("/usr/local/bin")
@@ -22,6 +26,11 @@
   (add-to-list 'load-path "~/dev/elisp/ace-jump-mode") ; ace-jump-mode
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "run-conkeror") ; open links in conkeror
+
+  ;;;; C header files
+  (defvar *c-headers*
+    '("/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/include"
+      "/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/include-fixed"))
   
   ;;;; bbdb
   (add-to-list 'load-path "~/dev/elisp/bbdb")
@@ -177,29 +186,33 @@
   (add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
   (add-hook 'message-send-mail-hook 'choose-msmtp-account)
   
-  (setq slime-js-swank-command "/usr/bin/swank-js") ; archlinux path for swank-js
+  ;; (setq slime-js-swank-command "/usr/bin/swank-js") ; archlinux path for swank-js
   )
 
 ;;;; GENERIC SETTINGS
 ;; elpa settings
 (require 'package)
-(setq package-archives '(("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 (package-initialize)
 
 ;; auto-install these on a fresh install
-(defvar my-packages '(ac-slime
+(defvar my-packages '(ace-jump-mode
+                      ac-slime
+                      ac-c-headers
+                      ecb
                       auto-complete
                       exec-path-from-shell
                       ido-ubiquitous
-                      ipython
                       js2-mode
                       js2-refactor
                       magit
                       paredit
                       yasnippet
-                      window-number))
+                      window-number
+                      color-theme
+                      autopair
+                      bbdb))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -216,6 +229,10 @@
 (ac-config-default)
 (global-auto-complete-mode t)
 (auto-complete-mode t)
+
+;;;; yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
     
 ;; open files over ssh
 (require 'tramp)
@@ -361,6 +378,7 @@ t)
  '(auto-save-file-name-transforms (quote ((".*" "~/.emacs.d/autosaves/\\1" t))))
  '(backup-directory-alist (quote ((".*" . "~/.emacs.d/backups/"))))
  '(dired-bind-jump nil)
+ '(ecb-options-version "2.40")
  '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom stamp track)))
  '(inhibit-startup-screen t)
  '(js2-basic-offset 4)
@@ -377,13 +395,30 @@ t)
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (local-set-key (kbd "RET") 'newline-and-indent)))
 
-;;;; C
-(add-hook 'c-mode-hook (lambda ()
-                         ( c-set-style "k&r")
-                         (electric-pair-mode 1)))
+;;;; Emacs Code Browser
+(require 'ecb)
+(require 'ecb-autoloads)
 
-(add-hook 'c-mode-hook' (lambda ()
-  (local-set-key (kbd "RET") 'newline-and-indent)))
+(setq ecb-layout-name "left3")
+(setq ecb-show-sources-in-directories-buffer 'always)
+(setq ecb-compile-window-height 12)
+
+(global-set-key (kbd "C-x C-;") 'ecb-activate)
+(global-set-key (kbd "C-x C-'") 'ecb-deactivate)
+
+;;;; C
+(defun c-mode-init ()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (mapc #'(lambda (d)
+            (add-to-list 'achead:include-directories d))
+        *c-headers*))
+
+(add-hook 'c-mode-hook (lambda ()
+                         (c-mode-init)
+                         ( c-set-style "k&r")
+                         (electric-pair-mode 1)
+                         (local-set-key (kbd "RET") 'newline-and-indent)))
 
 ;;;; html
 ;; bind RET to newline-and-indent in HTML
@@ -393,13 +428,12 @@ t)
 ;;;; LISP
 ;; load SLIME 
 (load (expand-file-name "~/quicklisp/slime-helper.el"))
-(add-to-list 'load-path "~/.emacs.d/slime-js")
 (require 'slime)
 (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 (setq lisp-indent-function 'common-lisp-indent-function)
 
-(slime-setup '(slime-js slime-repl))
+(slime-setup '(slime-repl))
 
 ;; set lisp-specific auto-complete
 (require 'ac-slime)
@@ -423,57 +457,7 @@ t)
 (define-key slime-mode-map [(?\()] 'paredit-open-list)
 (define-key slime-mode-map [(?\))] 'paredit-close-list)
 
-;;;; javascript
-(require 'autopair)
-(require 'js2-refactor)
-(autoload 'js2-mode "js2-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(add-to-list 'load-path "~/.emacs.d/")
-
-(require 'setup-slime-js)
-
-(slime-setup '(slime-js slime-repl))
-
-(setq slime-js-swank-args '())
-
-(js2r-add-keybindings-with-prefix "C-c C-m")
-(global-set-key [f5] 'slime-js-reload)
-
-(add-hook 'js2-mode-hook (lambda ()
-  (local-set-key (kbd "RET") 'newline-and-indent)
-  (slime-js-minor-mode 1)
-  (setq slime-use-autodoc-mode nil)
-  (autopair-mode 1)))
-
-;;;; python
-(setq py-install-directory "~/.emacs.d/python-mode.el-6.0.12")
-(add-to-list 'load-path py-install-directory)
-(setq py-set-complete-keymap-p t)
-(require 'python-mode)
-
-(setq auto-mode-alist (cons '("\\.py$" . python-mode) auto-mode-alist))
-(setq interpreter-mode-alist (cons '("python" . python-mode)
-interpreter-mode-alist))
-(autoload 'python-mode "python-mode" "Python editing mode." t)
-
-(global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
-(setq-default py-indent-offset 4)
-
-(setq python-shell-interpreter "ipython3")
-(setq-default py-shell-name "ipython3")
-(setq-default py-which-bufname "IPython")
-
-(setq py-shell-switch-buffers-on-execute-p t)
-(setq py-switch-buffers-on-execute-p t)
-
-(add-hook 'python-mode-hook ' (lambda ()
-                                (local-set-key (kbd "RET") 'newline-and-indent)
-                                (autopair-mode 1)
-                                'jedi:ac-setup))
-
 ;;;; ace-jump-Mode
-;; cloned from git because elpa version outdated
 
 (autoload
   'ace-jump-mode
@@ -503,7 +487,7 @@ interpreter-mode-alist))
 ;; autojoin
 (erc-autojoin-mode t)
 (setq erc-autojoin-channels-alist
-      '((".*\\.freenode.net" "#lisp" "#sbcl" "#lispweb")))
+      '((".*\\.freenode.net" "#lisp" "#sbcl" "#lispweb" "#quicklisp")))
 
 (add-hook 'erc-after-connect
           '(lambda (SERVER NICK)
@@ -521,3 +505,9 @@ interpreter-mode-alist))
                                 "324" "329" "332" "333" "353" "477"))
 
 (setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK")) ; don't show any of this
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
