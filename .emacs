@@ -16,6 +16,9 @@
   (setq slime-js-swank-command "/usr/local/bin/swank-js") ; osx path
                                         ; for swank-js
   (setq magit-emacsclient-executable "/usr/local/bin/emacsclient") ; osx path for working emacsclient
+
+  ;;;; SSL cert
+  (defvar *ssl-cert* "")
   )
 
 (defun linux ()
@@ -31,9 +34,11 @@
   (defvar *c-headers*
     '("/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/include"
       "/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/include-fixed"))
+
+  ;;;; SSL cert
+  (defvar *ssl-cert* "/etc/ssl/certs/ca-certificates.crt")
   
   ;;;; bbdb
-  (add-to-list 'load-path "~/dev/elisp/bbdb")
   (require 'bbdb)
   (bbdb-initialize)
 
@@ -199,6 +204,7 @@
 ;; auto-install these on a fresh install
 (defvar my-packages '(ace-jump-mode
                       ac-slime
+                      twittering-mode
                       ac-c-headers
                       ecb
                       auto-complete
@@ -389,6 +395,10 @@ t)
  '(win-switch-idle-time 0.75))
 
 (make-directory "~/.emacs.d/autosaves/" t)
+
+;;;; Twittering mode
+(require 'twittering-mode)
+(setq twittering-cert-file *ssl-cert*)
 
 ;;;; MODE SPECIFIC SETTINGS
 ;;;; emacs lisp
