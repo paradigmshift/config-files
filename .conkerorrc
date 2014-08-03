@@ -1,0 +1,61 @@
+load_paths.unshift("chrome://conkeror-contrib/content/");
+
+// give me new tabs; open buffers (tabs) in the background
+require("new-tabs.js");
+require("clicks-in-new-buffer");
+clicks_in_new_buffer_target = OPEN_NEW_BUFFER_BACKGROUND;
+clicks_in_new_buffer_button = 1; //midclick links in new buffers with
+
+// auto completion in the minibuffer
+minibuffer_auto_complete_default = true;
+url_completion_use_bookmarks = true;
+
+require("mode-line.js");
+
+// funky icons in the modeline
+
+require("mode-line-buttons.js");
+mode_line_add_buttons(standard_mode_line_buttons, true);
+
+// we'd like to see the # of buffers being loaded
+add_hook("mode_line_hook", mode_line_adder(loading_count_widget), true);
+// we don't need a clock
+remove_hook("mode_line_hook", mode_line_adder(clock_widget));
+
+// Bind Number Keys to Switch to Buffers 1-10
+function define_switch_buffer_key (key, buf_num) {
+    define_key(default_global_keymap, key,
+               function (I) {
+                   switch_to_buffer(I.window,
+                                    I.window.buffers.get_buffer(buf_num));
+               });
+}
+for (let i = 0; i < 10; ++i) {
+    define_switch_buffer_key(String((i+1)%10), i);
+}
+
+// static bookmarks
+define_webjump("hn", "http://news.ycombinator.com");
+define_webjump("fb", "http://facebook.com");
+
+define_webjump("so", "http://stackoverflow.com/search?q=%s");
+define_webjump("me", "http://math.stackexchange.com/search?q=%s");
+define_webjump("yt", "http://youtube.com/results?search_query=%s&aq=f");
+define_webjump("r", "http://reddit.com/r/%s");
+define_webjump("clhs", "http://www.xach.com/clhs?q=%s", $alternative = "http://www.lispworks.com/documentation/HyperSpec/Front/index.html");
+define_webjump("cliki", "http://www.cliki.net/admin/search?words=%s");
+define_webjump("py", "http://docs.python.org/py3k/search.html?q=%s");
+define_webjump("gh", "http://github.com/search?q=%s&type=Everything");
+
+// gmail
+define_webjump("1g", "http://mail.google.com/mail/u/0/");
+define_webjump("2g", "http://mail.google.com/mail/u/1/");
+define_webjump("3g", "http://mail.google.com/mail/u/2/");
+
+//google translate
+define_webjump("trans", "http://translate.google.com/translate_t#auto|en|%s");
+
+editor_shell_command = "emacsclient -c";
+view_source_use_external_editor = true;
+
+define_key(content_buffer_normal_keymap, "v", "view-source");
