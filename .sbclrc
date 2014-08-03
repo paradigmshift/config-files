@@ -1,5 +1,5 @@
-(require :asdf)
-(require :asdf-install)
+;;;(require :asdf)
+;;;(require :asdf-install)
 (setf SB-IMPL::*DEFAULT-EXTERNAL-FORMAT* :utf-8)
 ;;; The following lines added by ql:add-to-init-file:
 #-quicklisp
@@ -14,5 +14,3 @@
 (let ((wish "/home/mo/bin/wish"))
   (when (probe-file wish)
            (setq ltk::*wish-pathname* wish)))
-
-                                

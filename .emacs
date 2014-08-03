@@ -26,9 +26,8 @@
   (require 'ssl)
   (setq x-select-enable-clipboard t) ; cut and copy enable X clipboard
   (setq default-directory "/home/mo/") ; set default directory
-  (add-to-list 'load-path "~/dev/elisp/ace-jump-mode") ; ace-jump-mode
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "run-conkeror") ; open links in conkeror
+        browse-url-generic-program "conkeror") ; open links in conkeror
 
   ;;;; C header files
   (defvar *c-headers*
@@ -39,27 +38,26 @@
   (defvar *ssl-cert* "/etc/ssl/certs/ca-certificates.crt")
   
   ;;;; bbdb
+  (setq bbdb-file "~/.emacs.d/bbdb")
   (require 'bbdb)
   (bbdb-initialize)
 
   (setq 
-   bbdb-offer-save 1                        ;; 1 means save-without-asking
-
+   bbdb-pop-up-layout t                        ;; allow popups for addresses
+   bbdb-electric t                        ;; be disposable with SPC
+   bbdb-popup-window-size  1               ;; very small
    
-   bbdb-use-pop-up t                        ;; allow popups for addresses
-   bbdb-electric-p t                        ;; be disposable with SPC
-   bbdb-popup-target-lines  1               ;; very small
-   
-   bbdb-dwim-net-address-allow-redundancy t ;; always use full name
-   bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
+   bbdb-mail-avoid-redundancy t ;; always use full name
+   bbdb-add-name 2       ;; show name-mismatches 2 secs
 
-   bbdb-always-add-address t                ;; add new addresses to existing...
+   bbdb-add-mails t ;; add new addresses to existing...
+
    ;; ...contacts automatically
-   bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
+   bbdb-canonicalize-redundant-mails t     ;; x@foo.bar.cx => x@bar.cx
 
-   bbdb-completion-type nil                 ;; complete on anything
+   bbdb-completion-list nil                 ;; complete on anything
 
-   bbdb-complete-name-allow-cycling t       ;; cycle through matches
+   bbdb-complete-mail-allow-cycling t       ;; cycle through matches
    ;; this only works partially
 
    bbbd-message-caching-enabled t           ;; be fast
@@ -70,20 +68,19 @@
 
    ;; auto-create addresses from mail
    bbdb/mail-auto-create-p 'bbdb-ignore-some-messages-hook   
-   bbdb-ignore-some-messages-alist ;; don't ask about fake addresses
+   bbdb-ignore-message-alist ;; don't ask about fake addresses
    ;; NOTE: there can be only one entry per header (such as To, From)
    ;; http://flex.ee.uec.ac.jp/texi/bbdb/bbdb_11.html
 
    '(( "From" . "no.?reply\\|DAEMON\\|daemon\\|facebookmail\\|twitter")))
   ;; color theme
   (add-to-list 'load-path "~/dev/elisp/color-theme-6.6.0")
-  (require 'color-theme)
-  (autoload 'color-theme-djcb-dark "djcb-dark" "new dark theme" t)
-  (require 'zenburn)
-  (eval-after-load  "color-theme"
-    '(progn
-       (color-theme-initialize)
-       (color-theme-zenburn)))
+  ;; (require 'color-theme)
+  (require 'zenburn-theme)
+  ;; (eval-after-load  "color-theme"
+  ;;   '(progn
+  ;;      (color-theme-initialize)
+  ;;      (zenburn-theme)))
 
   (setq inferior-lisp-program "sbcl -K full")
 
@@ -96,7 +93,7 @@
   (setq
    mu4e-maildir       "~/Mail"   ;; top-level Maildir
    mu4e-sent-messages-behavior 'delete
-   mu4e-get-mail-command "email-update.sh"   ;; or fetchmail, or ...
+   mu4e-get-mail-command "offlineimap"   ;; or fetchmail, or ...
    mu4e-update-interval 600
    message-kill-buffer-on-exit t
    mu4e-view-show-images t
@@ -131,7 +128,13 @@
            (mu4e-drafts-folder "/mozart/[Gmail].Drafts")
            (user-mail-address "mozart@mozartreina.com")
            (user-full-name "Mozart Reina")
-           (mu4e-trash-folder "/mozart/[Gmail].Trash"))))
+           (mu4e-trash-folder "/mozart/[Gmail].Trash"))
+          ("yogamomo"
+           (mu4e-sent-folder "/yogamomo/[Gmail].Sent Mail")
+           (mu4e-drafts-folder "/yogamomo/[Gmail].Drafts")
+           (user-mail-address "info@yoga-momo.com")
+           (user-full-name "Ashtanga Yoga Center Osaka")
+           (mu4e-trash-folder "/yogamomo/[Gmail].Trash"))))
 
   (setq mu4e-refile-folder 
         (lambda (msg) 
@@ -144,8 +147,10 @@
                ((string-match "opensource" (mu4e-message-field msg :maildir)) 
                 "/opensource/[Gmail].All Mail")
                ((string-match "mozart" (mu4e-message-field msg :maildir)) 
-                "/mozart/[Gmail].All Mail")) 
-            "/urban/[Gmail].All Mail")))
+                "/mozart/[Gmail].All Mail")
+               ((string-match "yogamomo" (mu4e-message-field msg :maildir)) 
+                "/yogamomo/[Gmail].All Mail"))
+              "/urban/[Gmail].All Mail")))
 
 
   (setq message-send-mail-function 'message-send-mail-with-sendmail
@@ -163,7 +168,8 @@
                  ((string-match "urban.yoga.journeys@gmail.com" from) "urban")
                  ((string-match "momo.reina@gmail.com" from) "momo")
                  ((string-match "mo.opensource@gmail.com" from) "opensource")
-                 ((string-match "mozart@mozartreina.com" from) "mozart")))
+                 ((string-match "mozart@mozartreina.com" from) "mozart")
+                 ((string-match "info@yoga-momo.com" from) "yogamomo")))
                (account-vars (cdr (assoc account mo-mu4e-account-alist))))
             (mapc #'(lambda (var)
                       (set (car var) (cadr var)))
@@ -189,6 +195,14 @@
 
   (setq message-sendmail-envelope-from 'header)
   (add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
+  (add-hook 'mu4e-compose-mode-hook
+            (defun my-add-cc ()
+              "Add a Bcc: header."
+              (save-excursion (message-add-header "Cc: \n"))))
+  (add-hook 'mu4e-compose-mode-hook
+            (defun my-add-bcc ()
+              "Add a Bcc: header."
+              (save-excursion (message-add-header "Bcc: \n"))))
   (add-hook 'message-send-mail-hook 'choose-msmtp-account)
   
   ;; (setq slime-js-swank-command "/usr/bin/swank-js") ; archlinux path for swank-js
