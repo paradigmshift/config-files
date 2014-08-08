@@ -250,6 +250,11 @@
 (global-auto-complete-mode t)
 (auto-complete-mode t)
 
+;; load smex
+(require 'smex)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-x") 'smex-major-mode-commands)
+
 ;;;; yasnippet
 (require 'yasnippet)
 (yas-global-mode 1)

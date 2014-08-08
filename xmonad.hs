@@ -49,7 +49,7 @@ myManageHook = composeAll
              , manageDocks
              ]
              where 
-                   viewShift    = doF . liftM2 (.) W.greedyView W.shift
+                   viewShift    = doF . liftM2 (.) W.greedyView W.shift       
                    classNotRole :: (String, String) -> Query Bool
                    classNotRole (c,r) = className =? c <&&> role =? r
                    role = stringProperty "WM_WINDOW_ROLE"
