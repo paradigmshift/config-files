@@ -253,7 +253,6 @@
 ;; load smex
 (require 'smex)
 (global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-x") 'smex-major-mode-commands)
 
 ;;;; yasnippet
 (require 'yasnippet)
@@ -407,7 +406,7 @@ t)
  '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom stamp track)))
  '(inhibit-startup-screen t)
  '(js2-basic-offset 4)
- '(python-python-command "python3.3")
+ '(python-python-command "python")
  '(scroll-bar-mode nil)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
@@ -418,6 +417,10 @@ t)
 ;;;; Twittering mode
 (require 'twittering-mode)
 (setq twittering-cert-file *ssl-cert*)
+(setq twittering-icon-mode t)
+(setq twittering-timer-interval 180)
+(setq twittering-url-show-status nil)
+(setq twittering-use-master-password t)
 
 ;;;; MODE SPECIFIC SETTINGS
 ;;;; emacs lisp
@@ -434,6 +437,16 @@ t)
 
 (global-set-key (kbd "C-x C-;") 'ecb-activate)
 (global-set-key (kbd "C-x C-'") 'ecb-deactivate)
+
+;;;; Python
+(elpy-enable)
+(add-hook 'python-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook (lambda ()
+                              (local-set-key (kbd "RET") 'newline-and-indent)
+                              (define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+                              (define-key global-map (kbd "C-c o") 'iedit-mode)
+                              (setq elpy-rpc-backend "jedi")
+                              (setq jedi:complete-on-dot t)))
 
 ;;;; C
 (defun c-mode-init ()
@@ -486,6 +499,14 @@ t)
 (define-key slime-mode-map [(?\()] 'paredit-open-list)
 (define-key slime-mode-map [(?\))] 'paredit-close-list)
 
+;;; autopair
+(require 'autopair)
+(defvar autopair-modes '(python-mode))
+(defun turn-on-autopair-mode ()
+  (autopair-mode 1))
+(dolist (mode autopair-modes) (add-hook (intern (concat (symbol-name mode) "-hook")) 'turn-on-autopair-mode))
+
+
 ;;;; ace-jump-Mode
 
 (autoload
@@ -516,7 +537,7 @@ t)
 ;; autojoin
 (erc-autojoin-mode t)
 (setq erc-autojoin-channels-alist
-      '((".*\\.freenode.net" "#lisp" "#sbcl" "#lispweb" "#quicklisp")))
+      '((".*\\.freenode.net" "#lisp" "#sbcl" "#quicklisp")))
 
 (add-hook 'erc-after-connect
           '(lambda (SERVER NICK)

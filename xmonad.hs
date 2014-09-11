@@ -1,4 +1,4 @@
-import XMonad           
+import XMonad
 import XMonad.Layout.NoBorders  
 import XMonad.Layout.PerWorkspace  
 import XMonad.Layout.Spacing
@@ -25,16 +25,20 @@ myLayout =
         delta = 5/100
         nobordersLayout = smartBorders $ Full
         gridLayout = spacing 8 $ Grid
-        myIMLayout = avoidStruts $ smartBorders $ reflectHoriz $ withIM skypeRatio skypeRoster (tiled ||| reflectTiled ||| Grid) where
+        -- skypeLayout = withIM (1/8) skypeRoster (tiled ||| reflectTiled ||| Grid) where 
+        --         skypeRoster = (ClassName "Skype") `And`
+        --                        (Not (Title "Options")) `And`
+        --                                       (Not (Role "ConversationsWindow")) `And`
+        --                                                      (Not (Role "CallWindow"))
+        myIMLayout = avoidStruts $ smartBorders $ withIM ratio skypeRoster $ reflectHoriz $
+                                                                 withIM ratio jitsiRoster chatLayout where
                 chatLayout = Grid
-                ratio = 1/9
-                skypeRatio = 1/8
-                emacsRoster = And (ClassName "Emacs") (Title "irc")
+                ratio = 1/8
+                jitsiRoster = (ClassName "Jitsi") `And` (Title "Jitsi")
                 skypeRoster = (ClassName "Skype") `And`
                                (Not (Title "Options")) `And`
                                               (Not (Role "ConversationsWindow")) `And`
                                                              (Not (Role "CallWindow"))
-
 
 myWorkspaces = ["1:coding","2","3:IM", "4:mail"]
 
@@ -46,6 +50,7 @@ myManageHook = composeAll
              , title =? "irc"                                           --> doShift "3:IM"
              , className =? "Skype"                                     --> doShift "3:IM"
              , classNotRole ("Skype", "MainWindow")                     --> doFloat
+             , className =? "Jitsi"                                     --> doShift "3:IM"
              , manageDocks
              ]
              where 
@@ -84,7 +89,7 @@ main = do
                            ,(( mod4Mask .|. shiftMask, xK_r ), spawn "conkeror")
                            ,(( mod4Mask .|. shiftMask, xK_l ), spawn "conkeror https://slack.com/signin")
                            ,(( mod4Mask .|. shiftMask, xK_u ), spawn "emacs --title 'mail' -f mu4e ")
-                           ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect")
+                           ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f split-window-right -f twit -f other-window -f split-window-below")
                            ,(( mod4Mask .|. shiftMask, xK_s ), spawn "skype")
                            ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox")
                            ]
