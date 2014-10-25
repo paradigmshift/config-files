@@ -1,0 +1,4 @@
+;;;; HTML
+;; bind RET to newline-and-indent in HTML
+(add-hook 'html-mode-hook' (lambda ()
+  (local-set-key (kbd "RET") 'newline-and-indent)))

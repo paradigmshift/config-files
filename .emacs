@@ -422,83 +422,6 @@ t)
 (setq twittering-url-show-status nil)
 (setq twittering-use-master-password t)
 
-;;;; MODE SPECIFIC SETTINGS
-;;;; emacs lisp
-(add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (local-set-key (kbd "RET") 'newline-and-indent)))
-
-;;;; Emacs Code Browser
-(require 'ecb)
-(require 'ecb-autoloads)
-
-(setq ecb-layout-name "left3")
-(setq ecb-show-sources-in-directories-buffer 'always)
-(setq ecb-compile-window-height 12)
-
-(global-set-key (kbd "C-x C-;") 'ecb-activate)
-(global-set-key (kbd "C-x C-'") 'ecb-deactivate)
-
-;;;; Python
-(elpy-enable)
-(add-hook 'python-mode-hook 'jedi:setup)
-(add-hook 'python-mode-hook (lambda ()
-                              (local-set-key (kbd "RET") 'newline-and-indent)
-                              (define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
-                              (define-key global-map (kbd "C-c o") 'iedit-mode)
-                              (setq elpy-rpc-backend "jedi")
-                              (setq jedi:complete-on-dot t)))
-
-;;;; C
-(defun c-mode-init ()
-  (require 'auto-complete-c-headers)
-  (add-to-list 'ac-sources 'ac-source-c-headers)
-  (mapc #'(lambda (d)
-            (add-to-list 'achead:include-directories d))
-        *c-headers*))
-
-(add-hook 'c-mode-hook (lambda ()
-                         (c-mode-init)
-                         ( c-set-style "k&r")
-                         (electric-pair-mode 1)
-                         (local-set-key (kbd "RET") 'newline-and-indent)))
-
-;;;; html
-;; bind RET to newline-and-indent in HTML
-(add-hook 'html-mode-hook' (lambda ()
-  (local-set-key (kbd "RET") 'newline-and-indent)))
-
-;;;; LISP
-;; load SLIME 
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(require 'slime)
-(add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
-(setq lisp-indent-function 'common-lisp-indent-function)
-
-(slime-setup '(slime-repl))
-
-;; set lisp-specific auto-complete
-(require 'ac-slime)
-(add-hook 'slime-mode-hook 'set-up-slime-ac)
-
-(add-hook 'slime-mode-hook (lambda()
-  (local-set-key (kbd "RET") 'newline-and-indent)))
-
-(defun slimekbd-mode-hook ()
-  (define-key slime-mode-map (kbd "C-t") 'transpose-sexps)
-  (define-key slime-mode-map (kbd "C-M-t") 'transpose-chars)
-  )
-
-(add-hook 'slime-mode-hook 'slimekbd-mode-hook)
-
-;; paredit
-(autoload 'enable-paredit-mode "paredit" t)
-(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook #'enable-paredit-mode)
-(add-hook 'slime-mode-hook #'enable-paredit-mode)
-(define-key slime-mode-map [(?\()] 'paredit-open-list)
-(define-key slime-mode-map [(?\))] 'paredit-close-list)
-
 ;;; autopair
 (require 'autopair)
 (defvar autopair-modes '(python-mode))
@@ -506,9 +429,7 @@ t)
   (autopair-mode 1))
 (dolist (mode autopair-modes) (add-hook (intern (concat (symbol-name mode) "-hook")) 'turn-on-autopair-mode))
 
-
 ;;;; ace-jump-Mode
-
 (autoload
   'ace-jump-mode
   "ace-jump-mode"
@@ -529,35 +450,34 @@ t)
   '(ace-jump-mode-enable-mark-sync))
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
 
-;;;;ERC emacs irc client
-(require 'erc)
-(add-to-list 'load-path "~/dev/elisp/erc-5.3-extras")
-(setq erc-auto-query 'window-noselect)
+;;;; Emacs Code Browser
+(require 'ecb)
+(require 'ecb-autoloads)
 
-;; autojoin
-(erc-autojoin-mode t)
-(setq erc-autojoin-channels-alist
-      '((".*\\.freenode.net" "#lisp" "#sbcl" "#quicklisp")))
+(setq ecb-layout-name "left3")
+(setq ecb-show-sources-in-directories-buffer 'always)
+(setq ecb-compile-window-height 12)
 
-(add-hook 'erc-after-connect
-          '(lambda (SERVER NICK)
-             (cond
-              ((string-match "freenode\\.net" SERVER)
-               (erc-message  "PRIVMSG" "NickServ identify forzaitalia")))))
+(global-set-key (kbd "C-x C-;") 'ecb-activate)
+(global-set-key (kbd "C-x C-'") 'ecb-deactivate)
 
-(defun irc-connect ()
-  (interactive)
-  (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina"))
+;;;; MODE SPECIFIC SETTINGS
 
-;; check channels
-(erc-track-mode t)
-(setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE"
-                                "324" "329" "332" "333" "353" "477"))
+;;;; Python
+(load "~/.emacs.python")
 
-(setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK")) ; don't show any of this
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;;; C
+(load "~/.emacs.c")
+
+;;;; HTML
+(load "~/.emacs.html")
+
+;;;; Lisp
+(load "~/.emacs.lisp")
+
+;;;; JS
+(load "~/.emacs.javascript")
+
+;;;; ERC
+(load "~/.emacs.erc")
+

@@ -1,0 +1,26 @@
+;;;;ERC emacs irc client
+(require 'erc)
+(add-to-list 'load-path "~/dev/elisp/erc-5.3-extras")
+(setq erc-auto-query 'window-noselect)
+
+;; autojoin
+(erc-autojoin-mode t)
+(setq erc-autojoin-channels-alist
+      '((".*\\.freenode.net" "#lisp" "#sbcl" "#quicklisp")))
+
+(add-hook 'erc-after-connect
+          '(lambda (SERVER NICK)
+             (cond
+              ((string-match "freenode\\.net" SERVER)
+               (erc-message  "PRIVMSG" "NickServ identify forzaitalia")))))
+
+(defun irc-connect ()
+  (interactive)
+  (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina"))
+
+;; check channels
+(erc-track-mode t)
+(setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE"
+                                "324" "329" "332" "333" "353" "477"))
+
+(setq erc-hide-list '("JOIN" "PART" "QUIT" "NICK")) ; don't show any of this
