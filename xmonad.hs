@@ -16,7 +16,7 @@ import qualified Data.Map as M
 import System.IO
 
 myLayout = 
-        avoidStrutsOn [U] $ onWorkspace "3:IM" myIMLayout $
+        avoidStrutsOn [U] $ onWorkspace "4:IM" myIMLayout $
          tiled ||| Mirror tiled ||| Full where
         tiled = spacing 5 $ Tall nmaster delta ratio
         reflectTiled = (reflectHoriz tiled)
@@ -40,17 +40,17 @@ myLayout =
                                               (Not (Role "ConversationsWindow")) `And`
                                                              (Not (Role "CallWindow"))
 
-myWorkspaces = ["1:coding","2","3:IM", "4:mail"]
+myWorkspaces = ["1:coding","2", "3","4:IM", "5:mail"]
 
 myManageHook = composeAll
              [ className =? "Firefox"                                   --> viewShift "2"
              , (className =? "Rekonq" <&&> resource =? "Dialog")        --> doFloat
              , className =? "Yakuake"                                   --> doFloat
-             , title =? "mail"                                          --> doShift "4:mail"
-             , title =? "irc"                                           --> doShift "3:IM"
-             , className =? "Skype"                                     --> doShift "3:IM"
+             , title =? "mail"                                          --> doShift "5:mail"
+             , title =? "irc"                                           --> doShift "4:IM"
+             , className =? "Skype"                                     --> doShift "4:IM"
              , classNotRole ("Skype", "MainWindow")                     --> doFloat
-             , className =? "Jitsi"                                     --> doShift "3:IM"
+             , className =? "Jitsi"                                     --> doShift "4:IM"
              , manageDocks
              ]
              where 
