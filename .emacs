@@ -250,6 +250,12 @@
 (global-auto-complete-mode t)
 (auto-complete-mode t)
 
+;; key-chord
+(add-to-list 'load-path "~/.emacs.d/")
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global "jk" 'evil-normal-state)
+
 ;; load smex
 (require 'smex)
 (global-set-key (kbd "M-x") 'smex)

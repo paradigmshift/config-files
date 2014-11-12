@@ -5,8 +5,10 @@
 ;; syntax highlight amount
 (setq js2-highlight-level 3)
 
-;; initalize tern and auto-complete
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+;; initalize tern, auto-complete, and electric-pair
+(add-hook 'js-mode-hook (lambda ()
+                          (tern-mode t)
+                          (electric-pair-mode 1)))
 (eval-after-load 'tern
    '(progn
       (require 'tern-auto-complete)
@@ -23,7 +25,7 @@
 
 ;; eval js
 (eval-after-load 'js
-  '(define-key javascript-mode-map (kbd "C-c c") 'nodejs-repl-eval-dwim))
+  '(define-key js-mode-map (kbd "C-c c") 'nodejs-repl-eval-dwim))
 
 (defun nodejs-repl-eval-dwim ()
   "Heuristic evaluation of JS code in a NodeJS repl.
