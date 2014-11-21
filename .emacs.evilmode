@@ -9,7 +9,7 @@
 (setq evil-insert-state-cursor '("grey" box)) 
 (blink-cursor-mode t)
 
-(loop for (mode . state) in '((inferior-emacs-lis-mode . emacs)
+(loop for (mode . state) in '((inferior-emacs-lisp-mode . emacs)
                               (git-commit-mode . insert)
                               (git-rebase-mode . emacs)
                               (magit-branch-manager-mode . emacs)
