@@ -251,10 +251,12 @@
 (auto-complete-mode t)
 
 ;; key-chord
-(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/keychord/")
 (require 'key-chord)
 (key-chord-mode 1)
-(key-chord-define-global "jk" 'evil-normal-state)
+
+;; evil-mode
+(load-file "~/.emacs.evilmode")
 
 ;; load smex
 (require 'smex)
@@ -263,7 +265,7 @@
 ;;;; yasnippet
 (require 'yasnippet)
 (yas-global-mode 1)
-    
+
 ;; open files over ssh
 (require 'tramp)
 (setq tramp-default-method "ssh")
@@ -279,7 +281,7 @@
        (cadr (frame-parameter nil 'alpha))
        100)
       (set-frame-parameter nil 'alpha '(100 100))
-    (set-frame-parameter nil 'alpha '(85 50))))
+      (set-frame-parameter nil 'alpha '(85 50))))
 
 (global-set-key (kbd "C-c t") 'toggle-transparency)
 
@@ -302,12 +304,12 @@ FORCE-OTHER-WINDOW is ignored."
       (if (one-window-p)
           (let ((new-win (if (> (window-width) 40)
                              (split-window-horizontally)
-                           (split-window-vertically))))
+                             (split-window-vertically))))
             (set-window-buffer new-win buffer)
             new-win)
-        (let ((new-win (get-lru-window)))
-          (set-window-buffer new-win buffer)
-          new-win))))
+          (let ((new-win (get-lru-window)))
+            (set-window-buffer new-win buffer)
+            new-win))))
 
 (setq display-buffer-function 'th-display-buffer)
 
@@ -320,10 +322,10 @@ FORCE-OTHER-WINDOW is ignored."
 
 ;; window-number for window swithcing
 (autoload 'window-number-mode "window-number"
-"A global minor mode that enables selection of windows according to
+  "A global minor mode that enables selection of windows according to
 numbers with the C-x C-j prefix. Another mode,
 `window-number-meta-mode` enables the use of the M- prefix."
-t)
+  t)
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -389,8 +391,8 @@ t)
 
 ;; resize window on loading 
 (setq initial-frame-alist
-  `((left . 70) (top . 30)
-    (width . 160) (height . 50)))
+      `((left . 70) (top . 30)
+        (width . 160) (height . 50)))
 
 (global-hl-line-mode 1) ; highlight current line 
 (setq scroll-step 1) ; set default scrolling step
@@ -437,8 +439,8 @@ t)
 
 ;;;; ace-jump-Mode
 (autoload
-  'ace-jump-mode
-  "ace-jump-mode"
+    'ace-jump-mode
+    "ace-jump-mode"
   "Emacs quick move minor mode"
   t)
 ;; you can select the key you prefer to
@@ -448,9 +450,9 @@ t)
 ;; enable a more powerful jump back function from ace jump mode
 ;;
 (autoload
-  'ace-jump-mode-pop-mark
-  "ace-jump-mode"
-  "Ace jump back:-)"
+    'ace-jump-mode-pop-mark
+    "ace-jump-mode"
+  "Ace jump back:-"
   t)
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
