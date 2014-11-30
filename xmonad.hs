@@ -16,7 +16,7 @@ import qualified Data.Map as M
 import System.IO
 
 myLayout = 
-        avoidStrutsOn [U] $ onWorkspace "4:IM" myIMLayout $
+        avoidStrutsOn [U] $ onWorkspace "2:lab" gridLayout $ onWorkspace "4:IM" myIMLayout $
          tiled ||| Mirror tiled ||| Full where
         tiled = spacing 5 $ Tall nmaster delta ratio
         reflectTiled = (reflectHoriz tiled)
@@ -24,15 +24,10 @@ myLayout =
         ratio = 2/3
         delta = 5/100
         nobordersLayout = smartBorders $ Full
-        gridLayout = spacing 8 $ Grid
-        -- skypeLayout = withIM (1/8) skypeRoster (tiled ||| reflectTiled ||| Grid) where 
-        --         skypeRoster = (ClassName "Skype") `And`
-        --                        (Not (Title "Options")) `And`
-        --                                       (Not (Role "ConversationsWindow")) `And`
-        --                                                      (Not (Role "CallWindow"))
+        gridLayout = spacing 8 $ Grid ||| Mirror tiled
         myIMLayout = avoidStruts $ smartBorders $ withIM ratio skypeRoster $ reflectHoriz $
                                                                  withIM ratio jitsiRoster chatLayout where
-                chatLayout = Grid
+                chatLayout = Grid ||| Full
                 ratio = 1/8
                 jitsiRoster = (ClassName "Jitsi") `And` (Title "Jitsi")
                 skypeRoster = (ClassName "Skype") `And`
@@ -40,7 +35,7 @@ myLayout =
                                               (Not (Role "ConversationsWindow")) `And`
                                                              (Not (Role "CallWindow"))
 
-myWorkspaces = ["1:coding","2", "3","4:IM", "5:mail"]
+myWorkspaces = ["1:timeout","2:lab", "3:engineering","4:IM", "5:mail"]
 
 myManageHook = composeAll
              [ className =? "Firefox"                                   --> viewShift "2"
