@@ -1,0 +1,244 @@
+;;;; GENERIC SETTINGS
+;; elpa settings
+(require 'package)
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+(package-initialize)
+
+;; auto-install these on a fresh install
+(defvar my-packages '(ace-jump-mode
+                      ac-slime
+                      twittering-mode
+                      ac-c-headers
+                      ecb
+                      auto-complete
+                      exec-path-from-shell
+                      ido-ubiquitous
+                      js2-mode
+                      js2-refactor
+                      magit
+                      paredit
+                      yasnippet
+                      window-number
+                      color-theme
+                      autopair
+                      bbdb
+                      git-gutter-fringe))
+
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
+
+;; load appropriate platform settings
+(if (eq system-type 'darwin)
+    (osx)
+  (linux))
+
+;; loading auto-complete
+(require 'auto-complete)
+(require 'auto-complete-config)
+(ac-config-default)
+(global-auto-complete-mode t)
+(auto-complete-mode t)
+
+;; load annot.el
+(require 'annot)
+
+;; ;; key-chord
+;; (add-to-list 'load-path "~/.emacs.d/keychord/")
+;; (require 'key-chord)
+;; (key-chord-mode 1)
+
+;; Fringe decorations
+(when (window-system)
+  (require 'git-gutter-fringe))
+
+(global-git-gutter-mode +1)
+(setq-default indicate-buffer-boundaries 'left)
+(setq-default indicate-empty-lines +1)
+
+;; evil-mode
+(load-file "~/.emacs.evilmode")
+
+;; load smex
+(require 'smex)
+(global-set-key (kbd "M-x") 'smex)
+
+;;;; yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;; open files over ssh
+(require 'tramp)
+(setq tramp-default-method "ssh")
+
+;; transparent buffer
+(set-frame-parameter (selected-frame) 'alpha '(85 50))
+(add-to-list 'default-frame-alist '(alpha 85 50))
+
+(eval-when-compile (require 'cl))
+
+(defun toggle-transparency ()
+  (interactive)
+  (if (/=
+       (cadr (frame-parameter nil 'alpha))
+       100)
+      (set-frame-parameter nil 'alpha '(100 100))
+      (set-frame-parameter nil 'alpha '(85 50))))
+
+(global-set-key (kbd "C-c t") 'toggle-transparency)
+
+;; side by side windows
+(defun th-display-buffer (buffer force-other-window)
+  "If BUFFER is visible, select it.
+
+If it's not visible and there's only one window, split the
+current window and select BUFFER in the new window. If the
+current window (before the split) is more than 165 columns wide,
+split horizontally, else split vertically.
+
+If the current buffer contains more than one window, select
+BUFFER in the least recently used window.
+
+This function returns the window which holds BUFFER.
+
+FORCE-OTHER-WINDOW is ignored."
+  (or (get-buffer-window buffer)
+      (if (one-window-p)
+          (let ((new-win (if (> (window-width) 40)
+                             (split-window-horizontally)
+                             (split-window-vertically))))
+            (set-window-buffer new-win buffer)
+            new-win)
+          (let ((new-win (get-lru-window)))
+            (set-window-buffer new-win buffer)
+            new-win))))
+
+(setq display-buffer-function 'th-display-buffer)
+
+(ido-mode t) ; ido mode for buffer switching
+(setq ido-enable-flex-matching t)
+(ido-ubiquitous-mode 1) ; ido mode everywhere
+
+(show-paren-mode 1) ; show matching
+(menu-bar-mode -1) ; hide menu bar
+
+;; ;; window-number for window swithcing
+;; (autoload 'window-number-mode "window-number"
+;;   "A global minor mode that enables selection of windows according to
+;; numbers with the C-x C-j prefix. Another mode,
+;; `window-number-meta-mode` enables the use of the M- prefix."
+;;   t)
+
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (window-number-mode 1)))
+
+;; (add-hook 'window-number-mode-hook
+;;           (lambda ()
+;;             (window-number-define-keys window-number-mode-map "C-x C-j ")))
+
+;; ;; insert line above current with proper indentation
+;; (defun smart-open-line-above ()
+;;   (interactive)
+;;   (move-beginning-of-line nil)
+;;   (newline-and-indent)
+;;   (forward-line -1)
+;;   (indent-according-to-mode))
+
+;; (global-set-key (kbd "M-O") 'smart-open-line-above)
+
+(global-set-key (kbd "C-x g") 'magit-status)
+
+;; ;; map top level folding to F1
+;; (defun mo-toggle-selective-display ()
+;;   (interactive)
+;;   (set-selective-display (if selective-display nil 1)))
+
+;; (global-set-key [f1] 'mo-toggle-selective-display)
+
+;; map window splitting to META 1, 2, 3, 0
+(global-set-key (kbd "M-3") 'split-window-horizontally) ; was digit argument
+(global-set-key (kbd "M-2") 'split-window-vertically) ; was digit argument
+(global-set-key (kbd "M-1") 'delete-other-windows) ; was digit argument
+(global-set-key (kbd "M-0") 'delete-window) ; was digit argument
+(global-set-key (kbd "M-o") 'other-window) ; was facemenu-keymap
+
+;; unmap C-x 0, 1, 2, 3, o
+(global-unset-key (kbd "C-x 3"))
+(global-unset-key (kbd "C-x 2"))
+(global-unset-key (kbd "C-x 1"))
+(global-unset-key (kbd "C-x 0"))
+(global-unset-key (kbd "C-x o"))
+
+;; map window switching to META <left> and <right>
+(defun select-next-window()
+  (interactive)
+  (select-window (next-window)))
+
+(defun select-previous-window ()
+  (interactive)
+  (select-window (previous-window)))
+
+(global-set-key (kbd "C-.") 'select-next-window)
+(global-set-key (kbd "C-,") 'select-previous-window)
+
+;; map buffer switching to C-X C-, and C-.
+(global-set-key (kbd "C-x C-.") 'next-buffer)
+(global-set-key (kbd "C-x C-,") 'previous-buffer)
+
+(global-set-key (kbd "C-x C-m") 'execute-extended-command) ; binding C-x C-m to META-x
+(global-set-key (kbd "C-w") 'backward-kill-word) ; set C-w to 'backward-kill-word
+(global-set-key (kbd "C-x C-k") 'kill-region) ; set C-x C-k to kill-region
+(global-set-key (kbd "<f7>") 'toggle-truncate-lines) ; word-wrap
+
+;; resize window on loading 
+(setq initial-frame-alist
+      `((left . 70) (top . 30)
+        (width . 160) (height . 50)))
+
+(global-hl-line-mode 1) ; highlight current line 
+(setq scroll-step 1) ; set default scrolling step
+(global-hl-line-mode 1) ; highlight current line 
+
+(setq-default indent-tabs-mode nil) ; space for tabs
+(setq-default tab-width 4) ; width for tab
+
+(make-directory "~/.emacs.d/autosaves/" t)
+
+;;;; Twittering mode
+(require 'twittering-mode)
+(setq twittering-cert-file *ssl-cert*)
+(setq twittering-icon-mode t)
+(setq twittering-timer-interval 180)
+(setq twittering-url-show-status nil)
+(setq twittering-use-master-password t)
+
+;;; autopair
+(require 'autopair)
+(defvar autopair-modes '(python-mode))
+(defun turn-on-autopair-mode ()
+  (autopair-mode 1))
+(dolist (mode autopair-modes) (add-hook (intern (concat (symbol-name mode) "-hook")) 'turn-on-autopair-mode))
+
+;;;; ace-jump-Mode
+(autoload
+    'ace-jump-mode
+    "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+;; you can select the key you prefer to
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+;; 
+;; enable a more powerful jump back function from ace jump mode
+;;
+(autoload
+    'ace-jump-mode-pop-mark
+    "ace-jump-mode"
+  "Ace jump back:-"
+  t)
+(eval-after-load "ace-jump-mode"
+  '(ace-jump-mode-enable-mark-sync))
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+

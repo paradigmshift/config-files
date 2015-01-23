@@ -1,0 +1,125 @@
+;;;; mu4e
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+(when (fboundp 'imagemagick-register-types)
+  (imagemagick-register-types))
+(require 'mu4e)
+
+(setq
+ mu4e-maildir       "~/Mail"   ;; top-level Maildir
+ mu4e-sent-messages-behavior 'delete
+ mu4e-get-mail-command "offlineimap"   ;; or fetchmail, or ...
+ mu4e-update-interval 600
+ message-kill-buffer-on-exit t
+ mu4e-view-show-images t
+ mu4e-image-max-width 800
+ mu4e-html2text-command "html2text -utf8 -width 72"
+ mu4e-html2text-command "w3m -dump -T text/html"
+ w3m-command "/usr/bin/w3m"
+ mu4e-view-prefer-html t
+ )
+
+(setq mo-mu4e-account-alist
+      '(("urban"
+         (mu4e-sent-folder "/urban/[Gmail].Sent Mail")
+         (mu4e-drafts-folder "/urban/[Gmail].Drafts")
+         (user-mail-address "urban.yoga.journeys@gmail.com")
+         (user-full-name "Mo Reina")
+         (mu4e-trash-folder "/urban/[Gmail].Trash"))
+        ("momo"
+         (mu4e-sent-folder "/momo/[Gmail].Sent Mail")
+         (mu4e-drafts-folder "/momo/[Gmail].Drafts")
+         (user-mail-address "momo.reina@gmail.com")
+         (user-full-name "momo reina")
+         (mu4e-trash-folder "/momo/[Gmail].Trash"))
+        ("opensource"
+         (mu4e-sent-folder "/opensource/[Gmail].Sent Mail")
+         (mu4e-drafts-folder "/opensource/[Gmail].Drafts")
+         (user-mail-address "mo.opensource@gmail.com")
+         (user-full-name "Mozart Reina")
+         (mu4e-trash-folder "/opensource/[Gmail].Trash"))
+        ("mozart"
+         (mu4e-sent-folder "/mozart/[Gmail].Sent Mail")
+         (mu4e-drafts-folder "/mozart/[Gmail].Drafts")
+         (user-mail-address "mozart@mozartreina.com")
+         (user-full-name "Mozart Reina")
+         (mu4e-trash-folder "/mozart/[Gmail].Trash"))
+        ("yogamomo"
+         (mu4e-sent-folder "/yogamomo/[Gmail].Sent Mail")
+         (mu4e-drafts-folder "/yogamomo/[Gmail].Drafts")
+         (user-mail-address "info@yoga-momo.com")
+         (user-full-name "Ashtanga Yoga Center Osaka")
+         (mu4e-trash-folder "/yogamomo/[Gmail].Trash"))))
+
+(setq mu4e-refile-folder 
+      (lambda (msg) 
+        (if msg 
+            (cond 
+             ((string-match "urban" (mu4e-message-field msg :maildir)) 
+              "/urban/[Gmail].All Mail") 
+             ((string-match "momo" (mu4e-message-field msg :maildir)) 
+              "/momo/[Gmail].All Mail") 
+             ((string-match "opensource" (mu4e-message-field msg :maildir)) 
+              "/opensource/[Gmail].All Mail")
+             ((string-match "mozart" (mu4e-message-field msg :maildir)) 
+              "/mozart/[Gmail].All Mail")
+             ((string-match "yogamomo" (mu4e-message-field msg :maildir)) 
+              "/yogamomo/[Gmail].All Mail"))
+            "/urban/[Gmail].All Mail")))
+
+(setq mu4e-maildir-shortcuts
+      '(("/urban/INBOX" . ?u)
+        ("/momo/INBOX" . ?M)
+        ("/mozart/INBOX" .?p)
+        ("/yogamomo/INBOX" .?y)))
+
+(setq message-send-mail-function 'message-send-mail-with-sendmail
+      sendmail-program "/usr/bin/msmtp")
+
+(defun choose-msmtp-account ()
+  (if (message-mail-p)
+      (save-excursion
+        (let*
+            ((from (save-restriction
+                     (message-narrow-to-headers)
+                     (message-fetch-field "from")))
+             (account
+              (cond
+               ((string-match "urban.yoga.journeys@gmail.com" from) "urban")
+               ((string-match "momo.reina@gmail.com" from) "momo")
+               ((string-match "mo.opensource@gmail.com" from) "opensource")
+               ((string-match "mozart@mozartreina.com" from) "mozart")
+               ((string-match "info@yoga-momo.com" from) "yogamomo")))
+             (account-vars (cdr (assoc account mo-mu4e-account-alist))))
+          (mapc #'(lambda (var)
+                    (set (car var) (cadr var)))
+                account-vars)
+          (setq message-sendmail-extra-arguments (list '"-a" account))))))
+
+(defun mo-mu4e-set-account () 
+  "Set the account for composing a message." 
+  (let* ((account
+          (if mu4e-compose-parent-message
+              (let ((maildir (mu4e-msg-field mu4e-compose-parent-message :maildir))) 
+                (string-match "/\\(.*?\\)/" maildir) 
+                (match-string 1 maildir))
+            (completing-read (format "Compose with account: (%s) " 
+                                     (mapconcat #'(lambda (var) (car var)) mo-mu4e-account-alist "/")) 
+                             (mapcar #'(lambda (var) (car var)) mo-mu4e-account-alist) 
+                             nil t nil nil (caar mo-mu4e-account-alist))))
+         (account-vars (cdr (assoc account mo-mu4e-account-alist))))
+    (if account-vars 
+        (mapc #'(lambda (var) 
+                  (set (car var) (cadr var))) 
+              account-vars))))
+
+(setq message-sendmail-envelope-from 'header)
+(add-hook 'mu4e-compose-pre-hook 'mo-mu4e-set-account)
+(add-hook 'mu4e-compose-mode-hook
+          (defun my-add-cc ()
+            "Add a Bcc: header."
+            (save-excursion (message-add-header "Cc: \n"))))
+(add-hook 'mu4e-compose-mode-hook
+          (defun my-add-bcc ()
+            "Add a Bcc: header."
+            (save-excursion (message-add-header "Bcc: \n"))))
+(add-hook 'message-send-mail-hook 'choose-msmtp-account)

@@ -1,0 +1,23 @@
+(setq-default org-src-fontify-natively t)
+
+(require 'ox-latex)
+
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+
+(setq-org-latex-listings 'minted)
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(defvar my-org-babel-evaluated-languages
+  '(emacs-lisp)
+  "List of languages that may be evaluated in Org documents")
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ (mapcar (lambda (lang)
+           (cons lang t))
+         my-org-babel-evaluated-languages))
+
