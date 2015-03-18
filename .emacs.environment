@@ -44,11 +44,6 @@
 ;; load annot.el
 (require 'annot)
 
-;; ;; key-chord
-;; (add-to-list 'load-path "~/.emacs.d/keychord/")
-;; (require 'key-chord)
-;; (key-chord-mode 1)
-
 ;; Fringe decorations
 (when (window-system)
   (require 'git-gutter-fringe))
@@ -123,39 +118,7 @@ FORCE-OTHER-WINDOW is ignored."
 (show-paren-mode 1) ; show matching
 (menu-bar-mode -1) ; hide menu bar
 
-;; ;; window-number for window swithcing
-;; (autoload 'window-number-mode "window-number"
-;;   "A global minor mode that enables selection of windows according to
-;; numbers with the C-x C-j prefix. Another mode,
-;; `window-number-meta-mode` enables the use of the M- prefix."
-;;   t)
-
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (window-number-mode 1)))
-
-;; (add-hook 'window-number-mode-hook
-;;           (lambda ()
-;;             (window-number-define-keys window-number-mode-map "C-x C-j ")))
-
-;; ;; insert line above current with proper indentation
-;; (defun smart-open-line-above ()
-;;   (interactive)
-;;   (move-beginning-of-line nil)
-;;   (newline-and-indent)
-;;   (forward-line -1)
-;;   (indent-according-to-mode))
-
-;; (global-set-key (kbd "M-O") 'smart-open-line-above)
-
 (global-set-key (kbd "C-x g") 'magit-status)
-
-;; ;; map top level folding to F1
-;; (defun mo-toggle-selective-display ()
-;;   (interactive)
-;;   (set-selective-display (if selective-display nil 1)))
-
-;; (global-set-key [f1] 'mo-toggle-selective-display)
 
 ;; map window splitting to META 1, 2, 3, 0
 (global-set-key (kbd "M-3") 'split-window-horizontally) ; was digit argument
@@ -241,4 +204,3 @@ FORCE-OTHER-WINDOW is ignored."
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
-

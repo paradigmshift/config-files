@@ -16,6 +16,7 @@
  mu4e-html2text-command "w3m -dump -T text/html"
  w3m-command "/usr/bin/w3m"
  mu4e-view-prefer-html t
+ mu4e-view-show-addresses t
  )
 
 (setq mo-mu4e-account-alist

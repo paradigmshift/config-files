@@ -3,13 +3,15 @@
 
 (evil-leader/set-leader ",")
 
-(evil-leader/set-key "w" 'save-buffer)
+(evil-leader/set-key "s" 'save-buffer)
 (evil-leader/set-key "q" 'kill-buffer-and-window)
 (evil-leader/set-key "h" 'dired-jump)
 (evil-leader/set-key "v" 'split-window-right)
-(evil-leader/set-key "e" 'pp-eval-last-sexp)
 (evil-leader/set-key "," 'other-window)
 (evil-leader/set-key "b" 'ibuffer)
+(evil-leader/set-key "w" 'w3m)
+(evil-leader/set-key "y" 'hn)
+(evil-leader/set-key "g" 'w3m-search)
 
 (require 'evil)
 (evil-mode 1)
@@ -19,7 +21,6 @@
   (define-key evil-insert-state-map (kbd "C-l") 'paredit-forward)
   (define-key evil-normal-state-map (kbd "C-h") 'paredit-backward)
   (define-key evil-insert-state-map (kbd "C-h") 'paredit-backward)
-  (define-key evil-normal-state-map (kbd "C-t") 'transpose-sexps)
   (define-key evil-insert-state-map (kbd "C-t") 'transpose-sexps)
   (define-key evil-normal-state-map (kbd "C-j") 'paredit-forward-down)
   (define-key evil-insert-state-map (kbd "C-j") 'paredit-forward-down)

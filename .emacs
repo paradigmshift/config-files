@@ -120,6 +120,10 @@
   (setq gnus-dired-mail-mode 'mu4e-user-agent)
   (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
+(eval-after-load "eww"
+  '(progn (define-key eww-mode-map "f" 'eww-lnum-follow)
+    (define-key eww-mode-map "F" 'eww-lnum-universal)))
+
 ;;;; Default environment settings
 (load "~/.emacs.environment")
 
@@ -151,6 +155,9 @@
 
 ;;;; ERC
 (load "~/.emacs.erc")
+
+;;;; w3m
+(load "~/.emacs.w3m")
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

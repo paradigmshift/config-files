@@ -1,18 +1,33 @@
+;; Global Capture 
+(define-key global-map (kbd "C-c c")
+  (lambda ()
+    (interactive) (org-capture nil "c")))
+
+(setq org-default-notes-file "~/notes/notes.org")
+
+(setq org-capture-templates
+      '(("c" "Capture" entry (file+headline "~/notes/notes.org" "Captured")
+         "* %? %i %a %:url %T")))
+
+;; Enable syntax highlighting in src blocks.
 (setq-default org-src-fontify-natively t)
-
+;; Include the latex-exporter.
 (require 'ox-latex)
-
+;; Add minted to the default packages to include when exporting.
 (add-to-list 'org-latex-packages-alist '("" "minted"))
-
+;; Tell the latex export to use the minted package for source
+;; code coloration.
 (setq-org-latex-listings 'minted)
-
+;; Let the exporter use the -shell-escape option to let latex
+;; execute several programs.
 (setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 (defvar my-org-babel-evaluated-languages
-  '(emacs-lisp)
+  '(emacs-lisp
+    lisp)
   "List of languages that may be evaluated in Org documents")
 
 (org-babel-do-load-languages
@@ -21,3 +36,14 @@
            (cons lang t))
          my-org-babel-evaluated-languages))
 
+(define-skeleton org-skeleton
+    "Header info for org file."
+  "Title: "
+  "#+TITLE:" str " \n"
+  "#+AUTHOR: Mozart Reina\n"
+  "#+email: mozart@mozartreina.com\n"
+  "#+INFOJS_OPT: \n"
+  "#+BABEL: :session *lisp* :cache yes :results output graphics :export both :tangle yes \n"
+  "-----")
+
+(global-set-key [C-S-f4] 'org-skeleton)

@@ -1,0 +1,54 @@
+(setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3.; zh-tw;
+                      HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML
+                      , like Gecko) Version/4.0 Mobile Safari/533.")
+
+(setq w3m-fill-column 100)
+
+(defun hn ()
+  (interactive)
+  (w3m-goto-url-new-session "http://news.ycombinator.com"))
+
+(defun reddit (reddit)
+  (interactive (list
+                (read-string "Enter the reddit (default: lisp): " nil nil
+                             "lisp" nil)))
+  (w3m-goto-url-new-session (format "http://m.reddit.com/r/%s" reddit)))
+
+(defun my-w3m-switch-to-buffer (arg)
+  "Select the ARG'th w3m buffer."
+  (interactive "p")
+  (let (buf)
+    (if (= arg 0)
+    (setq arg 10)
+      (setq arg (1- arg)))
+    (if (and (> arg -1) (setq buf (nth arg (w3m-list-buffers))))
+    (progn
+      (switch-to-buffer buf)
+      (run-hooks 'w3m-select-buffer-hook)
+      (w3m-select-buffer-update))
+      (message "No such buffer!"))))
+
+(add-hook 'w3m-mode-hook
+      (lambda ()
+        (dolist (bufnum '(0 1 2 3 4 5 6 7 8 9))
+          (let* ((bufstr (number-to-string bufnum))
+             (funcname (concat "my-w3m-switch-to-buffer-" bufstr)))
+        (eval `(defun ,(intern funcname) ()
+             (interactive)
+             (my-w3m-switch-to-buffer ,bufnum)))
+        (define-key w3m-mode-map bufstr
+          (intern funcname))))))
+
+(add-hook 'w3m-mode-hook
+          (lambda ()
+            (w3m-lnum-mode)))
+
+(add-hook 'w3m-mode-hook
+          (lambda ()
+            (define-key w3m-mode-map (kbd "x")
+              'w3m-view-url-with-external-browser)))
+
+(setq w3m-search-default-engine "g")
+(eval-after-load "w3m-search" '(progn
+                                (add-to-list 'w3m-search-engine-alist '("g"
+                                                                        "https://www.google.com/search?hl=en&q=%s" utf-8))))
