@@ -1,23 +1,88 @@
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+
 ;; Global Capture 
-(define-key global-map (kbd "C-c c")
-  (lambda ()
-    (interactive) (org-capture nil "c")))
+(define-key global-map (kbd "C-c c") 'org-capture)
 
 (setq org-default-notes-file "~/notes/notes.org")
 
 (setq org-capture-templates
       '(("c" "Capture" entry (file+headline "~/notes/notes.org" "Captured")
-         "* %? %i %a %:url %T")))
+         "* CAPTURED %? %i %a %:url %T")
+        ("n" "Note" entry (file+headline "~/notes/notes.org" "Captured")
+         "* CAPTURED %? %T")))
+
+(setq org-todo-keywords
+      (quote ((sequence "CAPTURED(c)" "NEXT(n)" "DEFERRED(f)" "WAITING(w)" "|" "DONE(d)"))))
+
+(setq org-use-fast-todo-selection t)
+
+(setq org-agenda-compact-blocks t)
+
+(setq org-treat-S-cursor-todo-selection-as-state-change nil)
+
+(setq org-agenda-custom-commands
+      '((" " "Agenda"
+         ((agenda "" ((org-agenda-ndays 1))) 
+          (todo "CAPTURED" ((org-agenda-overriding-header "Captured")
+                            (org-agenda-files '("~/notes/notes.org"))))
+          (tags "-@projects/NEXT" ((org-agenda-overriding-header "Next Actions")
+                                   (org-agenda-files '("~/notes/notes.org"))))
+          (todo "WAITING" ((org-agenda-overriding-header "Waiting")
+                           (org-agenda-files '("~/notes/notes.org"))))
+          (tags "@roby" ((org-agenda-overriding-header "Delegated")))
+          (tags "-@projects/DEFERRED" ((org-agenda-overriding-header "Deferred")
+                                       (org-agenda-files '("~/notes/notes.org"))))
+          (tags "@projects" ((org-agenda-overriding-header "Projects")
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-files '("~/notes/notes.org"))
+                             (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Projects"))
+                             (org-agenda-todo-list-sublevels 2)))
+          (tags "@projects/NEXT" ((org-agenda-overriding-header "Shala-Sys Next Tasks")
+                                  (org-agenda-files '("~/dev/lisp/shala-sys/shala-sys.org")))))
+         ((org-agenda-compact-blocks t))
+         nil)))
+
+(setq org-todo-keyword-faces
+      '(("CAPTURED" . "green")
+        ("WAITING" . "orange")
+        ("DEFERRED" . "gray")
+        ("DONE" . (:foreground "blue" :weight bold))))
+;; Files to link with org-agenda
+(setq org-agenda-files (list "~/notes/notes.org"
+                             "~/dev/lisp/shala-sys/shala-sys.org"))
+;; Target files for refiling
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 ("~/dev/lisp/shala-sys/shala-sys.org" :maxlevel . 9))))
+
+;; Use full outline paths for refile targets
+(setq org-outline-path-complete-in-steps nil)
+
+;; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+;; Use IDO for both buffer and file completion and ido-everywhere to t
+(setq org-completion-use-ido t)
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(ido-mode (quote both))
+
+;; Use the current window when visiting files and buffers with ido
+(setq ido-default-file-method 'selected-window)
+(setq ido-default-buffer-method 'selected-window)
+
+;; Use the current window for indirect buffer display
+(setq org-indirect-buffer-display 'current-window)
 
 ;; Enable syntax highlighting in src blocks.
 (setq-default org-src-fontify-natively t)
+
 ;; Include the latex-exporter.
 (require 'ox-latex)
 ;; Add minted to the default packages to include when exporting.
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 ;; Tell the latex export to use the minted package for source
 ;; code coloration.
-(setq-org-latex-listings 'minted)
+(setq org-latex-listings 'minted)
 ;; Let the exporter use the -shell-escape option to let latex
 ;; execute several programs.
 (setq org-latex-pdf-process

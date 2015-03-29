@@ -133,7 +133,7 @@
 ;;;; MODE SPECIFIC SETTINGS
 
 ;;;; Org-mode
-;; (load "~/.emacs.org")
+(load "~/.emacs.org")
 
 ;;;; mu4e
 (load "~/.emacs.mail")

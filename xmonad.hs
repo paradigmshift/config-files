@@ -83,10 +83,9 @@ main = do
                            ,(( mod4Mask .|. shiftMask, xK_e ), spawn "emacsclient -c")
                            ,(( mod4Mask .|. shiftMask, xK_r ), spawn "conkeror")
                            ,(( mod4Mask .|. shiftMask, xK_l ), spawn "conkeror https://slack.com/signin")
-                           ,(( mod4Mask .|. shiftMask, xK_u ), spawn "emacs --title 'mail' -f mu4e ")
+                           ,(( mod4Mask .|. shiftMask, xK_u ), spawn "LC_CTYPE=ja_JP.UTF-8 emacs --title 'mail' -f mu4e ")
                            ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f split-window-right -f twit -f other-window -f split-window-below")
-                           ,(( mod4Mask .|. shiftMask, xK_s ), spawn "skype")
-                           ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox")
+                           ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox-beta-bin")
                            ]
 
 

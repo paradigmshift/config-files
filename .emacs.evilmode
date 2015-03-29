@@ -12,6 +12,7 @@
 (evil-leader/set-key "w" 'w3m)
 (evil-leader/set-key "y" 'hn)
 (evil-leader/set-key "g" 'w3m-search)
+(evil-leader/set-key "a" 'org-agenda)
 
 (require 'evil)
 (evil-mode 1)
