@@ -7,51 +7,65 @@
 
 (setq org-capture-templates
       '(("c" "Capture" entry (file+headline "~/notes/notes.org" "Captured")
-         "* CAPTURED %? %i %a %:url %T")
+         "* ⛬ %? %i %a %:url %T")
         ("n" "Note" entry (file+headline "~/notes/notes.org" "Captured")
-         "* CAPTURED %? %T")))
+         "* ⛬ %? %T")
+        ("w" "" entry ;; 'w' for 'org-protocol'
+         (file+headline "~/notes/notes.org" "Captured")
+         "* ⛬ %? Source: %c, %u %i")))
 
 (setq org-todo-keywords
-      (quote ((sequence "CAPTURED(c)" "NEXT(n)" "DEFERRED(f)" "WAITING(w)" "|" "DONE(d)"))))
+      (quote ((sequence "⛬(c)" "►(n)" "◉(f)" "⌛(w)" "|" "✔(d)"))))
 
 (setq org-use-fast-todo-selection t)
 
 (setq org-agenda-compact-blocks t)
 
+(setq org-startup-indented t)
+
 (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 
 (setq org-agenda-custom-commands
       '((" " "Agenda"
-         ((agenda "" ((org-agenda-ndays 1))) 
-          (todo "CAPTURED" ((org-agenda-overriding-header "Captured")
+         ((agenda "" ((org-agenda-ndays 7))) 
+          (todo "⛬" ((org-agenda-overriding-header "Captured")
                             (org-agenda-files '("~/notes/notes.org"))))
-          (tags "-@projects/NEXT" ((org-agenda-overriding-header "Next Actions")
-                                   (org-agenda-files '("~/notes/notes.org"))))
-          (todo "WAITING" ((org-agenda-overriding-header "Waiting")
+          (tags "►/-@projects-✔" ((org-agenda-overriding-header "Next Actions")
+                                  (org-agenda-files '("~/notes/notes.org"))
+                                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Next"))
+                                  (org-tags-match-list-sublevels 'indented)
+                                  (org-agenda-todo-list-sublevels 3)))
+          (todo "⌛" ((org-agenda-overriding-header "Waiting")
                            (org-agenda-files '("~/notes/notes.org"))))
           (tags "@roby" ((org-agenda-overriding-header "Delegated")))
-          (tags "-@projects/DEFERRED" ((org-agenda-overriding-header "Deferred")
+          (tags "-@projects/◉" ((org-agenda-overriding-header "Deferred")
                                        (org-agenda-files '("~/notes/notes.org"))))
           (tags "@projects" ((org-agenda-overriding-header "Projects")
                              (org-tags-match-list-sublevels 'indented)
                              (org-agenda-files '("~/notes/notes.org"))
                              (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Projects"))
                              (org-agenda-todo-list-sublevels 2)))
-          (tags "@projects/NEXT" ((org-agenda-overriding-header "Shala-Sys Next Tasks")
-                                  (org-agenda-files '("~/dev/lisp/shala-sys/shala-sys.org")))))
+          (tags "@projects/►" ((org-agenda-overriding-header "Shala-Sys Next Tasks")
+                               (org-agenda-files '("~/dev/lisp/shala-sys/shala-sys.org")))))
          ((org-agenda-compact-blocks t))
          nil)))
 
+(setq org-agenda-start-on-weekday nil)
+
 (setq org-todo-keyword-faces
-      '(("CAPTURED" . "green")
-        ("WAITING" . "orange")
-        ("DEFERRED" . "gray")
-        ("DONE" . (:foreground "blue" :weight bold))))
+      '(("⛬" . "green")
+        ("⌛" . "orange")
+        ("◉" . "gray")
+        ("✔" . (:foreground "blue" :weight bold))))
 ;; Files to link with org-agenda
 (setq org-agenda-files (list "~/notes/notes.org"
+                             "~/notes/videos.org"
+                             "~/notes/books.org"
                              "~/dev/lisp/shala-sys/shala-sys.org"))
 ;; Target files for refiling
 (setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 ("~/notes/books.org" :maxlevel . 9)
+                                 ("~/notes/videos.org" :maxlevel . 9)
                                  ("~/dev/lisp/shala-sys/shala-sys.org" :maxlevel . 9))))
 
 ;; Use full outline paths for refile targets
@@ -112,3 +126,4 @@
   "-----")
 
 (global-set-key [C-S-f4] 'org-skeleton)
+(setq org-protocol-default-template-key "w")
