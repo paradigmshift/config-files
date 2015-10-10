@@ -16,7 +16,7 @@ import qualified Data.Map as M
 import System.IO
 
 myLayout = 
-        avoidStrutsOn [U] $ onWorkspace "2:lab" gridLayout $ onWorkspace "4:IM" myIMLayout $
+        avoidStrutsOn [U] $ onWorkspace "4:IM" myIMLayout $
          tiled ||| Mirror tiled ||| Full where
         tiled = spacing 5 $ Tall nmaster delta ratio
         reflectTiled = (reflectHoriz tiled)
@@ -84,7 +84,7 @@ main = do
                            ,(( mod4Mask .|. shiftMask, xK_r ), spawn "conkeror")
                            ,(( mod4Mask .|. shiftMask, xK_l ), spawn "conkeror https://slack.com/signin")
                            ,(( mod4Mask .|. shiftMask, xK_u ), spawn "LC_CTYPE=ja_JP.UTF-8 emacs --title 'mail' -f mu4e ")
-                           ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f split-window-right -f twit -f other-window -f split-window-below")
+                           ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f make-frame-command -f make-frame-command -f twit")
                            ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox-beta-bin")
                            ]
 
