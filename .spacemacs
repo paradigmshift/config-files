@@ -14,37 +14,38 @@
    '(
      env
      (erc :variables
-      erc-autojoin-mode t)
+          erc-autojoin-mode t)
      lisp
      javascript
      sql
      sqlup
      haskell
      (ruby :variables
-      ruby-enable-ruby-on-rails-support t)
+           ruby-enable-ruby-on-rails-support t)
+     ruby-on-rails 
      ;; --------------------------------------------------------
      ;; Example of useful layers you may want to use right away
      ;; Uncomment a layer name and press C-c C-c to install it
      ;; --------------------------------------------------------
      (auto-completion :variables
-      auto-completion-enable-company-help-tooltip t
-      global-auto-complete-mode t
-      auto-complete-mode t)
+                      auto-completion-enable-company-help-tooltip t
+                      global-auto-complete-mode t
+                      auto-complete-mode t)
      ;; better-defaults
      (git :variables
-      git-gutter-use-fringe t
-      git-enable-github-support t)
+          git-gutter-use-fringe t
+          git-enable-github-support t)
      ;; markdown
      (org :variables
-      org-use-fast-todo-selection t
-      org-agenda-compact-blocks t
-      org-startup-indented t
-      org-treat-S-cursor-todo-selection-as-state-change nil
-      org-outline-path-complete-in-steps nil
-      org-refile-allow-creating-parent-nodes 'confirm
-      org-src-fontify-natively t
-      org-latex-listings 'minted
-      org-agenda-start-on-weekday nil)
+          org-use-fast-todo-selection t
+          org-agenda-compact-blocks t
+          org-startup-indented t
+          org-treat-S-cursor-todo-selection-as-state-change nil
+          org-outline-path-complete-in-steps nil
+          org-refile-allow-creating-parent-nodes 'confirm
+          org-src-fontify-natively t
+          org-latex-listings 'minted
+          org-agenda-start-on-weekday nil)
      ;; syntax-checking
      mail
      )
@@ -162,13 +163,13 @@ before layers configuration."
   (server-start)
   (add-to-load-path "/usr/share/emacs/site-lisp/mu4e")
   (add-to-list 'load-path "/home/mo/dev/elisp") ; loading elisp files (should
-                                                ; consoldiate location for OSx
-                                                ; and linux)
+                                        ; consoldiate location for OSx
+                                        ; and linux)
   (defun irc-connect ()
     (interactive)
     (erc :server "irc.freenode.net" :port 6667 :nick "momo-reina"))
 
- )
+  )
 
 (defun dotspacemacs/user-config ()
   "Configuration function.
@@ -185,72 +186,79 @@ layers configuration."
   (global-company-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "conkeror") 
+        browse-url-generic-program "conkeror")
 
-  (setq org-log-done t
-        org-default-notes-file "~/notes/notes.org"
-        org-agenda-files (list "~/notes/notes.org"
-                               "~/notes/videos.org"
-                               "~/notes/books.org"
-                               "~/dev/lisp/shala-sys/shala-sys.org")
-        org-refile-targets (quote ((nil :maxlevel . 9)
-                                   ("~/notes/books.org" :maxlevel . 9)
-                                   ("~/notes/videos.org" :maxlevel . 9)
-                                   ("~/dev/lisp/shala-sys/shala-sys.org" :maxlevel . 9))))
+  ;; (setq org-log-done t
+  ;;       org-default-notes-file "~/notes/notes.org"
+  ;;       org-agenda-files (list "~/notes/notes.org"
+  ;;                              "~/notes/videos.org"
+  ;;                              "~/notes/books.org"
+  ;;                              "~/dev/lisp/shala-sys/shala-sys.org")
+  ;;       org-refile-targets (quote ((nil :maxlevel . 9)
+  ;;                                  ("~/notes/books.org" :maxlevel . 9)
+  ;;                                  ("~/notes/videos.org" :maxlevel . 9)
+  ;;                                  ("~/dev/lisp/shala-sys/shala-sys.org" :maxlevel . 9))))
 
-  (setq org-capture-templates
-        '(("c" "Capture" entry (file+headline "~/notes/notes.org" "Captured")
-           "* ⛬ %? %i %a %:url %T")
-          ("n" "Note" entry (file+headline "~/notes/notes.org" "Captured")
-           "* ⛬ %? %T")
-          ("w" "" entry ;; 'w' for 'org-protocol'
-           (file+headline "~/notes/notes.org" "Captured")
-           "* ⛬ %? Source: %c, %u %i")))
+  ;; (setq org-capture-templates
+  ;;       '(("c" "Capture" entry (file+headline "~/notes/notes.org" "Captured")
+  ;;          "* ⛬ %? %i %a %:url %T")
+  ;;         ("n" "Note" entry (file+headline "~/notes/notes.org" "Captured")
+  ;;          "* ⛬ %? %T")
+  ;;         ("w" "" entry ;; 'w' for 'org-protocol'
+  ;;          (file+headline "~/notes/notes.org" "Captured")
+  ;;          "* ⛬ %? Source: %c, %u %i")))
 
-  (setq org-protocol-default-template-key "w")
+  ;; (setq org-protocol-default-template-key "w")
 
-  (setq org-todo-keywords (quote ((sequence "⛬(c)" "►(n)" "◉(f)" "⌛(w)" "|" "✔(d)")))
-        org-todo-keyword-faces '(("⛬" . "green")
-                                 ("⌛" . "orange")
-                                 ("◉" . "gray")
-                                 ("✔" . (:foreground "blue" :weight bold))))
+  ;; (setq org-todo-keywords (quote ((sequence "⛬(c)" "►(n)" "◉(f)" "⌛(w)" "|" "✔(d)")))
+  ;;       org-todo-keyword-faces '(("⛬" . "green")
+  ;;                                ("⌛" . "orange")
+  ;;                                ("◉" . "gray")
+  ;;                                ("✔" . (:foreground "blue" :weight bold))))
 
-  (setq org-agenda-custom-commands
-        '((" " "Agenda"
-           ((agenda "" ((org-agenda-ndays 7)))
-            (todo "⛬" ((org-agenda-overriding-header "Captured")
-                       (org-agenda-files '("~/notes/notes.org"))))
-            (tags "►/-@projects-✔" ((org-agenda-overriding-header "Next Actions")
-                                    (org-agenda-files '("~/notes/notes.org"))
-                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Next"))
-                                    (org-tags-match-list-sublevels 'indented)
-                                    (org-agenda-todo-list-sublevels 3)))
-            (todo "⌛" ((org-agenda-overriding-header "Waiting")
-                       (org-agenda-files '("~/notes/notes.org"))))
-            (tags "@roby" ((org-agenda-overriding-header "Delegated")))
-            (tags "-@projects/◉" ((org-agenda-overriding-header "Deferred")
-                                  (org-agenda-files '("~/notes/notes.org"))))
-            (tags "@projects" ((org-agenda-overriding-header "Projects")
-                               (org-tags-match-list-sublevels 'indented)
-                               (org-agenda-files '("~/notes/notes.org"))
-                               (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Projects"))
-                               (org-agenda-todo-list-sublevels 2)))
-            (tags "@projects/►" ((org-agenda-overriding-header "Shala-Sys Next Tasks")
-                                 (org-agenda-files '("~/dev/lisp/shala-sys/shala-sys.org")))))
-           ((org-agenda-compact-blocks t))
-           nil)))
+  ;; (setq org-agenda-custom-commands
+  ;;       '((" " "Agenda"
+  ;;          ((agenda "" ((org-agenda-ndays 7)))
+  ;;           (todo "⛬" ((org-agenda-overriding-header "Captured")
+  ;;                      (org-agenda-files '("~/notes/notes.org"))))
+  ;;           (tags "►/-@projects-✔" ((org-agenda-overriding-header "Next Actions")
+  ;;                                   (org-agenda-files '("~/notes/notes.org"))
+  ;;                                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Next"))
+  ;;                                   (org-tags-match-list-sublevels 'indented)
+  ;;                                   (org-agenda-todo-list-sublevels 3)))
+  ;;           (todo "⌛" ((org-agenda-overriding-header "Waiting")
+  ;;                      (org-agenda-files '("~/notes/notes.org"))))
+  ;;           (tags "@roby" ((org-agenda-overriding-header "Delegated")))
+  ;;           (tags "-@projects/◉" ((org-agenda-overriding-header "Deferred")
+  ;;                                 (org-agenda-files '("~/notes/notes.org"))))
+  ;;           (tags "@projects" ((org-agenda-overriding-header "Projects")
+  ;;                              (org-tags-match-list-sublevels 'indented)
+  ;;                              (org-agenda-files '("~/notes/notes.org"))
+  ;;                              (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "Projects"))
+  ;;                              (org-agenda-todo-list-sublevels 2)))
+  ;;           (tags "@projects/►" ((org-agenda-overriding-header "Shala-Sys Next Tasks")
+  ;;                                (org-agenda-files '("~/dev/lisp/shala-sys/shala-sys.org")))))
+  ;;          ((org-agenda-compact-blocks t))
+  ;;          nil)))
 
   (add-to-list 'org-latex-packages-alist '("" "minted"))
   (setq org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
                                 "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
+
+  (defun org-remove-headlines (backend)
+    "Remove headlines with :no_title: tag."
+    (org-map-entries (lambda () (delete-region (point-at-bol) (point-at-eol)))
+                     "no_title"))
+
+  (add-hook 'org-export-before-processing-hook #'org-remove-headlines)
   ;; ---------------------------------------------------------------------------
   ;; erc
   ;; ---------------------------------------------------------------------------
   (add-hook 'erc-after-connect
             '(lambda (SERVER NICK)
-              (cond
+               (cond
                 ((string-match "freenode\\.net" SERVER)
                  (erc-message  "PRIVMSG" "NickServ identify manglavite")))))
 
