@@ -96,7 +96,7 @@ define_key(content_buffer_normal_keymap, "H", "find-url-from-history");
 // save link to pocket
 function pocket_send_mail (url, window) {
     var cmd_str = "echo '" + url + "' \| mail add@getpocket.com";
-    if (window != n) {
+    if (window != null) {
         window.minibuffer.message('Saving ' + cmd_str);
     }
     shell_command_blind(cmd_str);

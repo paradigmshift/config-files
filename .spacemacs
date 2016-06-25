@@ -15,7 +15,8 @@
      env
      (erc :variables
           erc-autojoin-mode t)
-     lisp
+     ;lisp
+     common-lisp
      javascript
      sql
      sqlup
