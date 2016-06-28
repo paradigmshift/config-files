@@ -6,10 +6,12 @@
  import XMonad.Layout.IM
  import XMonad.Layout.Reflect
  import XMonad.Hooks.FadeInactive
+ import Graphics.X11.ExtraTypes.XF86
  import XMonad.Hooks.DynamicLog
  import XMonad.Hooks.ManageDocks
  import XMonad.Util.Run
  import XMonad.Util.EZConfig
+ import XMonad.Util.Scratchpad
  import Control.Monad
  import qualified XMonad.StackSet as W
  import qualified Data.Map as M
@@ -37,6 +39,8 @@
 
  myWorkspaces = ["1:timeout","2:lab", "3:engineering","4:IM", "5:mail"]
 
+ myTerminal = "urxvt"
+
  myManageHook = composeAll
               [ className =? "Firefox"                                   --> viewShift "2"
               , (className =? "Rekonq" <&&> resource =? "Dialog")        --> doFloat
@@ -63,7 +67,17 @@
 
  myLogHook :: X ()
  myLogHook = fadeInactiveLogHook fadeAmount
-           where fadeAmount = 0.6
+           where
+             fadeAmount = 0.6
+             hideScratchpad ws = if ws == "NSP" then "" else pad ws -- don't show scratchpad in workspace list
+
+ manageScratchPad :: ManageHook
+ manageScratchPad = scratchpadManageHook (W.RationalRect l t w h)
+   where
+     h = 0.4
+     w = 0.8
+     t = 0
+     l = 0.1
 
  main = do
      xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmobarrc"
@@ -72,12 +86,12 @@
                             , terminal = "urxvt"
                             , handleEventHook = docksEventHook
                             , workspaces = myWorkspaces
-                            , manageHook = myManageHook <+> manageHook defaultConfig <+> manageDocks
+                            , manageHook = myManageHook <+> manageHook defaultConfig <+> manageDocks <+> manageScratchPad
                             , logHook = myLogHook <+> dynamicLogWithPP xmobarPP
-                              { ppOutput = hPutStrLn xmproc
-                              , ppTitle = xmobarColor "blue" "" . shorten 50
-                              , ppLayout = const ""
-                              }
+                              -- { ppOutput = hPutStrLn xmproc
+                              -- , ppTitle = xmobarColor "blue" "" . shorten 50
+                              -- , ppLayout = const ""
+                              -- }
                             }
                             `additionalKeys`
                             [(( mod4Mask .|. shiftMask, xK_e ), return ())
@@ -88,9 +102,20 @@
                             ,(( mod4Mask, xK_minus ), sendMessage Shrink)
                             ,(( mod4Mask, xK_equal ), sendMessage Expand)
                             ,(( mod4Mask .|. shiftMask, xK_e ), spawn "emacsclient -c")
-                            ,(( mod4Mask .|. shiftMask, xK_r ), spawn "conkeror & 2>myerror.log")
+                            ,(( mod4Mask .|. shiftMask, xK_m ), spawn "chromium --force-device-scale-factor=2")
+                            ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox")
+                            ,(( mod4Mask .|. shiftMask, xK_r ), spawn "conkeror")
                             ,(( mod4Mask .|. shiftMask, xK_l ), spawn "conkeror https://slack.com/signin")
                             ,(( mod4Mask .|. shiftMask, xK_u ), spawn "LC_CTYPE=ja_JP.UTF-8 emacs --title 'mail' -f mu4e ")
-                            ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f make-frame-command -f make-frame-command -f twit")
-                            ,(( mod4Mask .|. shiftMask, xK_f ), spawn "firefox-beta-bin")
+                            ,(( mod4Mask .|. shiftMask, xK_i ), spawn "emacs --title 'irc' -f irc-connect -f make-frame-command -f")
+                            ,(( mod4Mask .|. shiftMask, xK_o ), scratchPad)
+                            ,((0                      , 0xff57), scratchPad)
+                            ,((0                      , xF86XK_MonBrightnessDown), spawn "xbacklight - 10")
+                            ,((0                      , xF86XK_MonBrightnessUp), spawn "xbacklight + 10")
+                            ,((0                      , xF86XK_AudioLowerVolume), spawn "amixer set Master 2-")
+                            ,((0                      , xF86XK_AudioRaiseVolume), spawn "amixer set Master 2+")
+                            ,((0                      , xF86XK_AudioMute), spawn "amixer set Master toggle; amixer set Speaker toggle")
                             ]
+
+     where
+       scratchPad = scratchpadSpawnActionTerminal myTerminal
