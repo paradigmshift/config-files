@@ -24,7 +24,7 @@ URxvt*letterSpace: -1
 URxvt.scrollStyle: rxvt
 URxvt.scrollBar: false
 
-URxvt.perl-ext-common: default,matcher,tabbed 
+URxvt.perl-ext-common: default,matcher,tabbedex
 URxvt.matcher.button: 1
 URxvt.urlLauncher: chromium
 
@@ -36,6 +36,10 @@ URxvt.tabbed.tabbar-fg: 2
 URxvt.tabbed.tabbar-bg: 0
 URxvt.tabbed.tab-fg: 3
 URxvt.tabbed.tab-bg: 0
+
+URxvt.keysym.Control-t: perl:tabbedex:new_tab
+URxvt.keysym.Control-period: perl:tabbedex:next_tab
+URxvt.keysym.Control-comma: perl:tabbedex:prev_tab
 
 URxvt.pointerBlank: true
 
